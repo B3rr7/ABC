@@ -17,7 +17,7 @@ A single, self-contained static webpage that teaches English from **zero to conv
 | **E** | কথা (Speaking) | Shadowing drill (listen → speak → see word-by-word match) and a 5-minute free-talk timer. |
 | **F** | লেখা (Writing) | Daily diary (auto-saved per date), commit-message practice, and a self-review mistake checklist. |
 | **G** | ড্যাশবোর্ড | Streak, words learned, patterns mastered, passages read, speaking sessions, conversations practiced — all from `localStorage`. Export / Import backup + Reset. |
-| **H** | কথোপকথন (Conversation) | **Interactive partner.** Pick a scene (talking with a girl, friend small-talk, coffee shop, weekend plans, directions). The partner speaks, you reply by **tapping a suggestion chip or speaking into the mic**, and the partner understands your intent and replies / asks the next question. |
+| **H** | কথোপকথন (Conversation) | **Interactive partner.** Pick a scene (talking with a girl, friend small-talk, coffee shop, weekend plans, directions, **complimenting a girl, asking for her number, asking her out, office small talk, at a party, at a restaurant**). The partner speaks, you reply by **tapping a suggestion chip or speaking into the mic**, and the partner understands your intent and replies / asks the next question. |
 
 ---
 

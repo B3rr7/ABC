@@ -539,6 +539,115 @@ window.EC_CONTENT = (function () {
             { you: "I'm not sure", hear: ["*"], say: "No worries, thanks anyway!", bn: "কোনো সমস্যা নয়, ধন্যবাদ!", end: true }
           ] }
       }
+    },
+    {
+      title: "একটা মেয়েকে প্রশংসা", en: "Complimenting a girl",
+      start: "c1",
+      nodes: {
+        c1: { bot: "I love your dress! It looks really nice.", bn: "তোমার ড্রেসটা খুব সুন্দর! দারুণ লাগছে।",
+          options: [
+            { you: "Thank you!", hear: ["thank", "thanks", "thx"], say: "Where did you get it from?", bn: "কোথা থেকে নিয়েছো?" },
+            { you: "Oh, this old one?", hear: ["old", "just", "nothing"], say: "Haha, it suits you! Where did you get it?", bn: "হাহা, তোমাকে ভালো লাগছে! কোথা থেকে নিয়েছো?" },
+            { you: "(সাধারণ)", hear: ["*"], say: "You look great today! Where did you get it?", bn: "তুমি আজ দারুণ দেখাচ্ছো! কোথা থেকে নিয়েছো?" }
+          ] },
+        c2: { bot: "Where did you get it from?", bn: "কোথা থেকে নিয়েছো?",
+          options: [
+            { you: "From the market", hear: ["market", "shop", "store", "mall"], say: "Nice! I should visit there too. You have good taste!", bn: "দারুণ! আমাকেও যেতে হবে। তোমার রুচি ভালো!", end: true },
+            { you: "My sister gave it", hear: ["sister", "friend", "gift", "brother"], say: "Sweet! Lucky you. You look lovely!", bn: "সুন্দর! ভাগ্যবান। তুমি খুব সুন্দর দেখাচ্ছো!", end: true },
+            { you: "(সাধারণ)", hear: ["*"], say: "Cool! You have great style. See you around!", bn: "দারুণ! তোমার স্টাইল ভালো। পরে দেখা!", end: true }
+          ] }
+      }
+    },
+    {
+      title: "নাম্বার চাওয়া", en: "Asking for her number",
+      start: "n1",
+      nodes: {
+        n1: { bot: "This was fun. Can I get your number?", bn: "এটা মজার ছিল। তোমার নাম্বারটা পাবো?",
+          options: [
+            { you: "Sure, here it is", hear: ["sure", "yes", "okay", "here", "why not"], say: "Awesome! I'll text you later. Talk soon!", bn: "দারুণ! পরে মেসেজ দেবো। শিগগির কথা হবে!", end: true },
+            { you: "Let's exchange social", hear: ["social", "insta", "facebook", "whatsapp", "exchange"], say: "Good idea! Send me a request. Talk soon!", bn: "ভালো আইডিয়া! রিকোয়েস্ট পাঠাও। শিগগির কথা হবে!", end: true },
+            { you: "Sorry, not comfortable", hear: ["sorry", "no", "not", "busy"], say: "No worries at all, I understand. Nice meeting you!", bn: "কোনো সমস্যা নয়, বুঝতে পারছি। তোমাকে জানতে ভালো লাগলো!", end: true },
+            { you: "(সাধারণ)", hear: ["*"], say: "Awesome, text me later! Talk soon!", bn: "দারুণ, পরে মেসেজ দিও! শিগগির কথা হবে!", end: true }
+          ] }
+      }
+    },
+    {
+      title: "কফি/ডেটে ডাকা", en: "Asking her out",
+      start: "o1",
+      nodes: {
+        o1: { bot: "Want to grab a coffee sometime?", bn: "কখনো কফি খেতে যাবে?",
+          options: [
+            { you: "I'd love to!", hear: ["love", "yes", "sure", "okay", "want"], say: "Great! How about Saturday evening?", bn: "দারুণ! শনিবার সন্ধ্যেটা কেমন?" },
+            { you: "Maybe another time", hear: ["maybe", "later", "not", "busy"], say: "Sure, another time then. Bye!", bn: "ঠিক আছে, আরেকদিন। বাই!", end: true },
+            { you: "(সাধারণ)", hear: ["*"], say: "Great! How about Saturday evening?", bn: "দারুণ! শনিবার সন্ধ্যেটা কেমন?" }
+          ] },
+        o2: { bot: "How about Saturday evening?", bn: "শনিবার সন্ধ্যেটা কেমন?",
+          options: [
+            { you: "Saturday works!", hear: ["saturday", "works", "yes", "fine", "good"], say: "Perfect, 7 pm at the cafe. Can't wait!", bn: "দারুণ, সন্ধ্যা ৭টায় কাফেতে। অপেক্ষায় থাকবো!", end: true },
+            { you: "Sunday better", hear: ["sunday", "better"], say: "Sunday works too! 7 pm then?", bn: "রবিবারও চলবে! তাহলে ৭টায়?", end: true },
+            { you: "(সাধারণ)", hear: ["*"], say: "Perfect, 7 pm at the cafe. See you!", bn: "দারুণ, সন্ধ্যা ৭টায় কাফেতে। দেখা হবে!", end: true }
+          ] }
+      }
+    },
+    {
+      title: "অফিসে কথা", en: "Office small talk",
+      start: "w1",
+      nodes: {
+        w1: { bot: "Hey, how's the new project going?", bn: "হাই, নতুন প্রজেক্টটা কেমন যাচ্ছে?",
+          options: [
+            { you: "Going well", hear: ["well", "good", "great", "fine"], say: "Nice! Any blockers I can help with?", bn: "সুন্দর! কোনো বাধা থাকলে বলো, সাহায্য করতে পারি।" },
+            { you: "A bit stressful", hear: ["stress", "hard", "bad", "not", "tough"], say: "Oh, take it easy. We can pair on it if you want.", bn: "ওহ, ধীরে চলো। চাইলে একসাথে করতে পারি।" },
+            { you: "(সাধারণ)", hear: ["*"], say: "Nice! Let me know if you need a hand.", bn: "সুন্দর! দরকার হলে বলো।" }
+          ] },
+        w2: { bot: "Any blockers I can help with?", bn: "কোনো বাধা থাকলে সাহায্য করতে পারি?",
+          options: [
+            { you: "Yes, the API is tricky", hear: ["yes", "api", "bug", "error", "help"], say: "Let's sync after lunch and fix it together.", bn: "দুপুরের পর একসাথে বসে ঠিক করি।", end: true },
+            { you: "No, I'm good", hear: ["no", "not", "fine", "okay"], say: "Cool, good luck with it!", bn: "দারুণ, শুভকামনা!", end: true },
+            { you: "(সাধারণ)", hear: ["*"], say: "Cool, good luck with it!", bn: "দারুণ, শুভকামনা!", end: true }
+          ] }
+      }
+    },
+    {
+      title: "পার্টিতে আড্ডা", en: "At a party",
+      start: "p1",
+      nodes: {
+        p1: { bot: "Hi! I haven't seen you here before. I'm Rani.", bn: "হাই! তোমাকে এখানে আগে দেখিনি। আমি রানি।",
+          options: [
+            { you: "Nice to meet you", hear: ["nice", "meet", "hello", "hi"], say: "Same! How do you know the host?", bn: "আমিও! তুমি হোস্টকে চেনো কীভাবে?" },
+            { you: "I'm new here", hear: ["new", "first", "friend", "guest"], say: "Welcome! How do you know the host?", bn: "স্বাগত! তুমি হোস্টকে চেনো কীভাবে?" },
+            { you: "(সাধারণ)", hear: ["*"], say: "Cool! How do you know the host?", bn: "দারুণ! তুমি হোস্টকে চেনো কীভাবে?" }
+          ] },
+        p2: { bot: "How do you know the host?", bn: "তুমি হোস্টকে চেনো কীভাবে?",
+          options: [
+            { you: "We work together", hear: ["work", "office", "job", "college", "school"], say: "Nice! So you're in tech too? Me too!", bn: "সুন্দর! তাহলে তুমিও টেকে? আমিও!", end: true },
+            { you: "Old friends", hear: ["friend", "old", "school", "childhood"], say: "Sweet! Small world. Enjoy the party!", bn: "দারুণ! দুনিয়া ছোট। পার্টি উপভোগ করো!", end: true },
+            { you: "(সাধারণ)", hear: ["*"], say: "Cool! Small world. Enjoy the party!", bn: "দারুণ! দুনিয়া ছোট। পার্টি উপভোগ করো!", end: true }
+          ] }
+      }
+    },
+    {
+      title: "রেস্টুরেন্টে", en: "At a restaurant",
+      start: "r1",
+      nodes: {
+        r1: { bot: "Good evening! Table for one?", bn: "শুভ সন্ধ্যা! একজনের টেবিল?",
+          options: [
+            { you: "Yes, one please", hear: ["yes", "one", "sure"], say: "Great, follow me. Here's the menu.", bn: "দারুণ, আসো। এই নাও মেনু।" },
+            { you: "Actually two", hear: ["two", "friend", "we"], say: "Sure, a table for two then.", bn: "ঠিক আছে, দুজনের টেবিল।" },
+            { you: "(সাধারণ)", hear: ["*"], say: "Great, follow me. Here's the menu.", bn: "দারুণ, আসো। এই নাও মেনু।" }
+          ] },
+        r2: { bot: "Here's the menu. Ready to order?", bn: "এই নাও মেনু। অর্ডার নেবো?",
+          options: [
+            { you: "I'll have the pasta", hear: ["pasta", "rice", "chicken", "burger", "pizza", "fish"], say: "Good choice! Anything to drink?", bn: "দারুণ পছন্দ! কিছু পানীয়?" },
+            { you: "I need a minute", hear: ["minute", "think", "wait", "not"], say: "No rush, I'll come back.", bn: "তাড়া নেই, পরে আসছি।", end: true },
+            { you: "(সাধারণ)", hear: ["*"], say: "Good choice! Anything to drink?", bn: "দারুণ পছন্দ! কিছু পানীয়?" }
+          ] },
+        r3: { bot: "Anything to drink?", bn: "কিছু পানীয়?",
+          options: [
+            { you: "Water, thanks", hear: ["water", "just", "nothing"], say: "Coming right up. Enjoy your meal!", bn: "একদম আনছি। খাবার অনেক উপভোগ করো!", end: true },
+            { you: "A juice, please", hear: ["juice", "coke", "soda", "tea", "coffee"], say: "Sure! Enjoy your meal!", bn: "অবশ্যই! খাবার উপভোগ করো!", end: true },
+            { you: "(সাধারণ)", hear: ["*"], say: "Coming right up. Enjoy!", bn: "একদম আনছি। উপভোগ করো!", end: true }
+          ] }
+      }
     }
   ];
 
