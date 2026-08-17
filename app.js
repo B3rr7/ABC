@@ -662,7 +662,7 @@
     }
     const listenBtn = el("button", { class: "btn blue", html: SPK_SVG + " শোনো", onclick: () => speak(sentences[idx]) });
     const srBtn = el("button", {
-      class: "btn primary", id: "sr-btn", html: MIC_SVG + " বলো", onclick: () => doRecognition(sentences[idx], srOut, srBtn)
+      class: "btn primary", id: "sr-btn", html: MIC_SVG + " বলো", onclick: () => doRecognition(sentences[idx], srOut, srBtn, () => { idx = (idx + 1) % sentences.length; showTarget(); })
     });
     const nextBtn = el("button", { class: "btn", text: "পরবর্তী →", onclick: () => { idx = (idx + 1) % sentences.length; showTarget(); } });
     drill.appendChild(el("div", { class: "section-title bn", text: "Shadowing drill (ছায়া অনুশীলন)" }));
@@ -699,7 +699,7 @@
     setView([head, drill, talk]);
   }
 
-  function doRecognition(target, outNode, btn) {
+  function doRecognition(target, outNode, btn, onCorrect) {
     if (!SR) {
       outNode.appendChild(el("div", { class: "note-box bn", html: "<b>এই ব্রাউজারে সাপোর্টেড নয়</b> — Chrome (Android/Desktop) ব্যবহার করো।" }));
       return;
@@ -714,7 +714,12 @@
 
     rec.onresult = (ev) => {
       const heard = ev.results[0][0].transcript;
-      showMatch(target, heard, outNode);
+      const pct = showMatch(target, heard, outNode);
+      if (pct >= 70) {
+        if (onCorrect) setTimeout(onCorrect, 800);
+      } else {
+        speak("Wrong, try again.");
+      }
     };
     rec.onerror = (ev) => {
       outNode.appendChild(el("div", { class: "feedback no", text: "ভুল: " + ev.error + " — ইন্টারনেট/মাইক চেক করো" }));
@@ -742,6 +747,7 @@
     const pct = tWords.length ? Math.round((matched / tWords.length) * 100) : 100;
     wrap.appendChild(el("div", { class: "feedback " + (pct >= 70 ? "ok" : "no"), text: (pct >= 70 ? "✓ চমৎকার! " : "আরেকবার চেষ্টা করো ") + "(" + pct + "%)" }));
     outNode.appendChild(wrap);
+    return pct;
   }
 
   function listenUser(cb, btn) {
