@@ -509,8 +509,9 @@
       ])
     ]);
     const list = el("div", {});
-    // Daily drill — a different pattern each day, in a shuffled (non-sequential) order
-    const dailyIdx = seededShuffle(C.PATTERNS.map((_, i) => i), dayIndex())[0];
+    // Daily drill — a fixed shuffled permutation so it changes every day AND never repeats the previous day's pattern
+    const perm = seededShuffle(C.PATTERNS.map((_, i) => i), 987654321);
+    const dailyIdx = perm[dayIndex() % C.PATTERNS.length];
     const daily = C.PATTERNS[dailyIdx];
     const dailyCard = grammarCard(daily);
     dailyCard.style.border = "1px solid #F2C14E";
