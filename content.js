@@ -25,7 +25,7 @@ window.EC_CONTENT = (function () {
     { l: "N", word: "Nose",        note: "জিভ ওপরে ছাদে, নাক দিয়ে 'ন'–এর মত" },
     { l: "O", word: "Orange",      note: "ঠোঁট গোল করে 'ও'–এর মত" },
     { l: "P", word: "Pen",         note: "ঠোঁট বুজে তারপর 'প'–এর মত খোলো" },
-    { l: "Q", word: "Queen",       note: "ক + য়ু মিলে 'কুইন' (q সবসময় u-এর সাথে)" },
+    { l: "Q", word: "Queen",       note: "ক + য়ু মিলে 'কুইন' (q সবসময় u-এর সঙ্গে)" },
     { l: "R", word: "Rat",         note: "জিভ গোল করে কাঁপিয়ে 'র'–এর মত (আমেরিকানে ছোট)" },
     { l: "S", word: "Sun",         note: "দাঁত বুজে হিসহিসে 'স'" },
     { l: "T", word: "Tree",        note: "জিভ দাঁতের ডগায় ছুঁইয়ে 'ট'–এর মত" },
@@ -43,7 +43,7 @@ window.EC_CONTENT = (function () {
     { en: "of", bn: "–এর" }, { en: "and", bn: "এবং" }, { en: "a", bn: "একটি" },
     { en: "in", bn: "মধ্যে" }, { en: "that", bn: "যে" }, { en: "have", bn: "আছে" },
     { en: "I", bn: "আমি" }, { en: "it", bn: "এটি" }, { en: "for", bn: "জন্য" },
-    { en: "not", bn: "না" }, { en: "on", bn: "উপরে" }, { en: "with", bn: "সাথে" },
+    { en: "not", bn: "না" }, { en: "on", bn: "উপরে" }, { en: "with", bn: "সঙ্গে" },
     { en: "he", bn: "সে (পুরুষ)" }, { en: "as", bn: "যেমন" }, { en: "you", bn: "তুমি/আপনি" },
     { en: "do", bn: "করা" }, { en: "at", bn: "–এ" }, { en: "this", bn: "এই" },
     { en: "but", bn: "কিন্তু" }, { en: "his", bn: "তার (পুরুষ)" }, { en: "by", bn: "দ্বারা" },
@@ -344,9 +344,9 @@ window.EC_CONTENT = (function () {
 
   /* ---------- Module E: Speaking prompts ---------- */
   const FREE_TALK_PROMPTS = [
-    "একটা মেয়ের সাথে কথা শুরু করো (Start a talk with a girl)",
+    "একটা মেয়ের সঙ্গে কথা শুরু করো (Start a talk with a girl)",
     "কফি শপে অর্ডার করো (Order at a coffee shop)",
-    "বন্ধুর সাথে আড্ডা (Chat with a friend)",
+    "বন্ধুর সঙ্গে আড্ডা (Chat with a friend)",
     "কাউকে কমপ্লিমেন্ট দাও (Give someone a compliment)",
     "ছুটির পরিকল্পনা জিজ্ঞেস করো (Ask about weekend plans)",
     "আজকের কাজ সম্পর্কে বলো (Talk about today's work)",
@@ -360,7 +360,7 @@ window.EC_CONTENT = (function () {
   // each: { title (bn), en (scene), lines: [{who, en, bn}] }
   const CONVERSATIONS = [
     {
-      title: "বন্ধুর সাথে আড্ডা", en: "Small talk with a friend",
+      title: "বন্ধুর সঙ্গে আড্ডা", en: "Small talk with a friend",
       lines: [
         { who: "তুমি", en: "Hey! How are you today?", bn: "হাই! আজ তুমি কেমন আছো?" },
         { who: "বন্ধু", en: "I'm good, thanks. And you?", bn: "আমি ভালো, ধন্যবাদ। আর তুমি?" },
@@ -369,13 +369,13 @@ window.EC_CONTENT = (function () {
       ]
     },
     {
-      title: "একটা মেয়ের সাথে কথা", en: "Talking with a girl",
+      title: "একটা মেয়ের সঙ্গে কথা", en: "Talking with a girl",
       lines: [
         { who: "তুমি", en: "Hi, I'm Rani. What's your name?", bn: "হাই, আমি রানি। তোমার নাম কী?" },
         { who: "মেয়ে", en: "I'm Aisha. Nice to meet you.", bn: "আমি আয়শা। তোমাকে জানতে ভালো লাগলো।" },
         { who: "তুমি", en: "Nice to meet you too. Do you like this cafe?", bn: "আমারও। তুমি এই কাফেটা পছন্দ করো?" },
         { who: "মেয়ে", en: "Yes, the coffee is really good.", bn: "হ্যাঁ, কফিটা খুব ভালো।" },
-        { who: "তুমি", en: "Cool. Can I sit with you?", bn: "দারুণ। আমি তোমার সাথে বসতে পারি?" }
+        { who: "তুমি", en: "Cool. Can I sit with you?", bn: "দারুণ। আমি তোমার সঙ্গে বসতে পারি?" }
       ]
     },
     {
@@ -462,7 +462,7 @@ window.EC_CONTENT = (function () {
   // reply is matched by `hear` keywords -> partner responds with `say` (and asks next via `goto`).
   const CONV_TREES = [
     {
-      title: "একটা মেয়ের সাথে কথা", en: "Talking with a girl",
+      title: "একটা মেয়ের সঙ্গে কথা", en: "Talking with a girl",
       start: "a",
       nodes: {
         a: { bot: "Hi, I'm Rani. What's your name?", bn: "হাই, আমি রানি। তোমার নাম কী?",
@@ -472,11 +472,11 @@ window.EC_CONTENT = (function () {
           ] },
         b: { bot: "Do you come here often?", bn: "তুমি কি এখানে নিয়মিত আসো?",
           options: [
-            { you: "Yes, often", hear: ["yes", "yeah", "often", "always", "every"], say: "Me too! The coffee here is really good. Can I sit with you?", bn: "আমিও! এখানকার কফি খুব ভালো। আমি তোমার সাথে বসতে পারি?" },
-            { you: "No, first time", hear: ["no", "not", "first", "never"], say: "Me neither, first time. But the coffee is good. Can I sit with you?", bn: "আমিও না, প্রথমবার। তবে কফি ভালো। আমি তোমার সাথে বসতে পারি?" },
-            { you: "(অন্য কিছু)", hear: ["*"], say: "Oh okay. The coffee is good though. Can I sit with you?", bn: "ওহ ঠিক আছে। কফি ভালো। আমি তোমার সাথে বসতে পারি?" }
+            { you: "Yes, often", hear: ["yes", "yeah", "often", "always", "every"], say: "Me too! The coffee here is really good. Can I sit with you?", bn: "আমিও! এখানকার কফি খুব ভালো। আমি তোমার সঙ্গে বসতে পারি?" },
+            { you: "No, first time", hear: ["no", "not", "first", "never"], say: "Me neither, first time. But the coffee is good. Can I sit with you?", bn: "আমিও না, প্রথমবার। তবে কফি ভালো। আমি তোমার সঙ্গে বসতে পারি?" },
+            { you: "(অন্য কিছু)", hear: ["*"], say: "Oh okay. The coffee is good though. Can I sit with you?", bn: "ওহ ঠিক আছে। কফি ভালো। আমি তোমার সঙ্গে বসতে পারি?" }
           ] },
-        c: { bot: "Can I sit with you?", bn: "আমি তোমার সাথে বসতে পারি?",
+        c: { bot: "Can I sit with you?", bn: "আমি তোমার সঙ্গে বসতে পারি?",
           options: [
             { you: "Sure, please", hear: ["yes", "sure", "okay", "please", "why not"], say: "Great! So, what do you do for work?", bn: "দারুণ! তাহলে, তুমি কী কাজ করো?" },
             { you: "Sorry, I'm busy", hear: ["no", "busy", "later"], say: "No worries! Maybe another time. Bye!", bn: "কোনো সমস্যা নয়! হয়তো আরেকদিন। বাই!", end: true },
@@ -484,12 +484,12 @@ window.EC_CONTENT = (function () {
           ] },
         d: { bot: "What do you do for work?", bn: "তুমি কী কাজ করো?",
           options: [
-            { you: "(যা কাজ করো)", hear: ["*"], say: "That's cool! Nice talking to you. See you around!", bn: "এটা দারুণ! তোমার সাথে কথা বলে ভালো লাগলো। পরে দেখা হবে!", end: true }
+            { you: "(যা কাজ করো)", hear: ["*"], say: "That's cool! Nice talking to you. See you around!", bn: "এটা দারুণ! তোমার সঙ্গে কথা বলে ভালো লাগলো। পরে দেখা হবে!", end: true }
           ] }
       }
     },
     {
-      title: "বন্ধুর সাথে আড্ডা", en: "Small talk with a friend",
+      title: "বন্ধুর সঙ্গে আড্ডা", en: "Small talk with a friend",
       start: "s1",
       nodes: {
         s1: { bot: "Hey! How are you today?", bn: "হাই! আজ তুমি কেমন আছো?",
@@ -501,7 +501,7 @@ window.EC_CONTENT = (function () {
         s2: { bot: "The weather is nice, right?", bn: "আবহাওয়া ভালো, তাই না?",
           options: [
             { you: "Yes, it's nice", hear: ["yes", "yeah", "nice", "sunny"], say: "Let's sit outside and chat!", bn: "চলো বাইরে বসে আড্ডা দিই!", end: true },
-            { you: "Not really", hear: ["no", "not", "cold", "hot"], say: "Haha, maybe inside then. Chat with me!", bn: "হাহা, তাহলে ভেতরে। আমার সাথে আড্ডা দাও!", end: true },
+            { you: "Not really", hear: ["no", "not", "cold", "hot"], say: "Haha, maybe inside then. Chat with me!", bn: "হাহা, তাহলে ভেতরে। আমার সঙ্গে আড্ডা দাও!", end: true },
             { you: "(সাধারণ)", hear: ["*"], say: "Let's sit outside and chat!", bn: "চলো বাইরে বসে আড্ডা দিই!", end: true }
           ] }
       }
@@ -513,7 +513,7 @@ window.EC_CONTENT = (function () {
         c1: { bot: "Hi, what can I get for you?", bn: "হাই, আপনাকে কী দেব?",
           options: [
             { you: "A latte, please", hear: ["latte", "coffee", "tea", "cappuccino"], say: "Sure! Small or large?", bn: "অবশ্যই! ছোট নাকি বড়?" },
-            { you: "Just water", hear: ["water"], say: "Okay, coming right up!", bn: "ঠিক আছে, একদম আনছি!", end: true },
+            { you: "Just water", hear: ["water"], say: "Okay, coming right up!", bn: "ঠিক আছে, এখুনি আনছি!", end: true },
             { you: "I'll look first", hear: ["*"], say: "No rush, take your time.", bn: "তাড়া নেই, সময় নাও।" }
           ] },
         c2: { bot: "Small or large?", bn: "ছোট নাকি বড়?",
@@ -536,11 +536,11 @@ window.EC_CONTENT = (function () {
       nodes: {
         w1: { bot: "What are you doing this weekend?", bn: "এই সপ্তাহান্তে তুমি কী করছো?",
           options: [
-            { you: "Maybe a movie", hear: ["movie", "cinema", "film"], say: "Nice! Want to join me?", bn: "সুন্দর! আমার সাথে যোগ দেবে?" },
-            { you: "Nothing much", hear: ["nothing", "rest", "home", "not"], say: "Then come with me to a movie!", bn: "তাহলে আমার সাথে সিনেমায় চলো!" },
-            { you: "I'll see", hear: ["*"], say: "Maybe a movie? Want to join me?", bn: "হয়তো সিনেমা? আমার সাথে যোগ দেবে?" }
+            { you: "Maybe a movie", hear: ["movie", "cinema", "film"], say: "Nice! Want to join me?", bn: "সুন্দর! আমার সঙ্গে যোগ দেবে?" },
+            { you: "Nothing much", hear: ["nothing", "rest", "home", "not"], say: "Then come with me to a movie!", bn: "তাহলে আমার সঙ্গে সিনেমায় চলো!" },
+            { you: "I'll see", hear: ["*"], say: "Maybe a movie? Want to join me?", bn: "হয়তো সিনেমা? আমার সঙ্গে যোগ দেবে?" }
           ] },
-        w2: { bot: "Want to join me?", bn: "আমার সাথে যোগ দেবে?",
+        w2: { bot: "Want to join me?", bn: "আমার সঙ্গে যোগ দেবে?",
           options: [
             { you: "Sure, what time?", hear: ["sure", "yes", "okay", "time"], say: "Saturday, 7 pm. Deal?", bn: "শনিবার, সন্ধ্যা ৭টায়। ঠিক আছে?" },
             { you: "Sorry, busy", hear: ["busy", "sorry", "no", "can't"], say: "No worries, another time! Bye!", bn: "কোনো সমস্যা নয়, আরেকদিন! বাই!", end: true },
@@ -621,12 +621,12 @@ window.EC_CONTENT = (function () {
         w1: { bot: "Hey, how's the new project going?", bn: "হাই, নতুন প্রজেক্টটা কেমন যাচ্ছে?",
           options: [
             { you: "Going well", hear: ["well", "good", "great", "fine"], say: "Nice! Any blockers I can help with?", bn: "সুন্দর! কোনো বাধা থাকলে বলো, সাহায্য করতে পারি।" },
-            { you: "A bit stressful", hear: ["stress", "hard", "bad", "not", "tough"], say: "Oh, take it easy. We can pair on it if you want.", bn: "ওহ, ধীরে চলো। চাইলে একসাথে করতে পারি।" },
+            { you: "A bit stressful", hear: ["stress", "hard", "bad", "not", "tough"], say: "Oh, take it easy. We can pair on it if you want.", bn: "ওহ, ধীরে চলো। চাইলে একসঙ্গে করতে পারি।" },
             { you: "(সাধারণ)", hear: ["*"], say: "Nice! Let me know if you need a hand.", bn: "সুন্দর! দরকার হলে বলো।" }
           ] },
         w2: { bot: "Any blockers I can help with?", bn: "কোনো বাধা থাকলে সাহায্য করতে পারি?",
           options: [
-            { you: "Yes, the API is tricky", hear: ["yes", "api", "bug", "error", "help"], say: "Let's sync after lunch and fix it together.", bn: "দুপুরের পর একসাথে বসে ঠিক করি।", end: true },
+            { you: "Yes, the API is tricky", hear: ["yes", "api", "bug", "error", "help"], say: "Let's sync after lunch and fix it together.", bn: "দুপুরের পর একসঙ্গে বসে ঠিক করি।", end: true },
             { you: "No, I'm good", hear: ["no", "not", "fine", "okay"], say: "Cool, good luck with it!", bn: "দারুণ, শুভকামনা!", end: true },
             { you: "(সাধারণ)", hear: ["*"], say: "Cool, good luck with it!", bn: "দারুণ, শুভকামনা!", end: true }
           ] }
@@ -668,9 +668,9 @@ window.EC_CONTENT = (function () {
           ] },
         r3: { bot: "Anything to drink?", bn: "কিছু পানীয়?",
           options: [
-            { you: "Water, thanks", hear: ["water", "just", "nothing"], say: "Coming right up. Enjoy your meal!", bn: "একদম আনছি। খাবার অনেক উপভোগ করো!", end: true },
+            { you: "Water, thanks", hear: ["water", "just", "nothing"], say: "Coming right up. Enjoy your meal!", bn: "এখুনি আনছি। খাবার অনেক উপভোগ করো!", end: true },
             { you: "A juice, please", hear: ["juice", "coke", "soda", "tea", "coffee"], say: "Sure! Enjoy your meal!", bn: "অবশ্যই! খাবার উপভোগ করো!", end: true },
-            { you: "(সাধারণ)", hear: ["*"], say: "Coming right up. Enjoy!", bn: "একদম আনছি। উপভোগ করো!", end: true }
+            { you: "(সাধারণ)", hear: ["*"], say: "Coming right up. Enjoy!", bn: "এখুনি আনছি। উপভোগ করো!", end: true }
           ] }
       }
     }

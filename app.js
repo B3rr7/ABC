@@ -690,11 +690,11 @@
     });
     const promptList = el("ul", { class: "bn", style: "color:#8b949e;font-size:13px;margin:10px 0" });
     C.FREE_TALK_PROMPTS.forEach(p => promptList.appendChild(el("li", { text: p })));
-    talk.appendChild(el("div", { class: "section-title bn", text: "Free-talk timer (নিজের সাথে কথা)" }));
+    talk.appendChild(el("div", { class: "section-title bn", text: "Free-talk timer (নিজের সঙ্গে কথা)" }));
     talk.appendChild(timer);
     talk.appendChild(el("div", { class: "center mt" }, [startBtn]));
     talk.appendChild(promptList);
-    talk.appendChild(el("div", { class: "bn", style: "color:#8b949e;font-size:12px", text: "মাইক দিয়ে নিজের সাথে কথা বলো — এটি শুধু সাপোর্টিভ টাইমার।" }));
+    talk.appendChild(el("div", { class: "bn", style: "color:#8b949e;font-size:12px", text: "মাইক দিয়ে নিজের সঙ্গে কথা বলো — এটি শুধু সাপোর্টিভ টাইমার।" }));
 
     setView([head, drill, talk]);
   }
@@ -800,7 +800,7 @@
         cOut.appendChild(el("div", { class: "bn", style: "color:#8b949e;margin-bottom:4px", text: "ভালো উদাহরণ:" }));
         const ex = el("div", { class: "chk", text: "git commit -m \"" + C.COMMIT_PRACTICE[ci].en + "\"" });
         cOut.appendChild(ex);
-        cOut.appendChild(el("div", { class: "bn", style: "color:#8b949e;margin-top:6px", text: "(নিজেরটা এর সাথে মেলাও — কোনো AI গ্রেডিং নয়)" }));
+        cOut.appendChild(el("div", { class: "bn", style: "color:#8b949e;margin-top:6px", text: "(নিজেরটা এর সঙ্গে মেলাও — কোনো AI গ্রেডিং নয়)" }));
       }
     });
     const nextCP = el("button", {
