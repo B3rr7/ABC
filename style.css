@@ -24,6 +24,17 @@
   --cyan:#0E7C72;
   --red:#C0392B;
 }
+[data-theme="night"]{
+  --bg:#000000;
+  --surface:#0A0A0A;
+  --surface-2:#141414;
+  --line:#1E1E1E;
+  --text:#D7D7D7;
+  --muted:#7A7A7A;
+  --amber:#E0B341;
+  --cyan:#3FBDB1;
+  --red:#E25C5C;
+}
 body, .card, .flashcard, .progresswrap, .tabbar, .terminal, .note-box, .tile, .popover, .btn, .opt, .speak, .passage{
   transition: background-color .2s ease, color .2s ease, border-color .2s ease;
 }

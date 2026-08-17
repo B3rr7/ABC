@@ -1050,18 +1050,21 @@
     if (t) go(t.dataset.mod);
   });
 
+  const THEMES = ["dark", "light", "night"];
+  const THEME_ICON = { dark: "🌙", light: "☀️", night: "🌃" };
   function applyTheme(t) {
-    if (t === "light") document.documentElement.setAttribute("data-theme", "light");
-    else document.documentElement.removeAttribute("data-theme");
+    if (t === "dark") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", t);
     const b = document.getElementById("theme-btn");
-    if (b) b.textContent = (t === "light") ? "☀️" : "🌙";
+    if (b) b.textContent = THEME_ICON[t] || "🌙";
   }
   function initTheme() {
-    applyTheme(store.get("theme", "dark"));
+    const saved = store.get("theme", "dark");
+    applyTheme(THEMES.indexOf(saved) >= 0 ? saved : "dark");
     const b = document.getElementById("theme-btn");
     if (b) b.addEventListener("click", () => {
-      const cur = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
-      const next = cur === "light" ? "dark" : "light";
+      const cur = document.documentElement.getAttribute("data-theme") || "dark";
+      const next = THEMES[(THEMES.indexOf(cur) + 1) % THEMES.length];
       applyTheme(next);
       store.set("theme", next);
     });
