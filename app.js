@@ -39,6 +39,11 @@
 
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
 
+  /* ---------------- SVG icons (mic + speaker) ---------------- */
+  const SPK_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4.03v8.06A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06a9 9 0 0 0 0-17.54z"/></svg>';
+  const MIC_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>';
+  function dayIndex() { return Math.floor(Date.now() / 86400000); }
+
   /* ---------------- toast ---------------- */
   let toastTimer = null;
   function toast(msg) {
@@ -155,7 +160,7 @@
   function setView(nodes) { clear($view); (Array.isArray(nodes) ? nodes : [nodes]).forEach(n => $view.appendChild(n)); }
 
   function speaker(text, opts) {
-    return el("span", { class: "speak", title: "শোনো", onclick: () => speak(text, opts) }, "🔊");
+    return el("span", { class: "speak", title: "শোনো", onclick: () => speak(text, opts) }, [el("span", { class: "ico", html: SPK_SVG })]);
   }
 
   function normalize(s) {
@@ -343,7 +348,7 @@
     ]);
     const srOut = el("div", { class: "mt" });
     const recBtn = el("button", {
-      class: "btn small", text: "🎤 উচ্চারণ চেক",
+      class: "btn small", html: MIC_SVG + " উচ্চারণ চেক",
       onclick: () => {
         listenUser(transcript => {
           clear(srOut);
@@ -433,52 +438,72 @@
     return el("div", { class: "ring-wrap" }, [svg, el("div", { class: "bn", style: "font-size:11px;color:#8b949e", text: label })]);
   }
 
+  function grammarCard(p) {
+    const box = el("div", { class: "card", style: "text-align:left;margin:10px 0;padding:14px" });
+    box.appendChild(el("div", { class: "row" }, [
+      el("div", {}, [
+        el("div", { style: "font-weight:700;color:#58a6ff", text: p.pattern }),
+        el("div", { class: "bn", style: "color:#8b949e;font-size:13px", text: p.meaning })
+      ]),
+      el("span", { class: "spacer" }),
+      ring(patternMastery(p.id), p.pattern.split(" ")[1] || p.id)
+    ]));
+    box.appendChild(el("div", { class: "bn", style: "color:#8b949e;font-size:12px;margin:8px 0", text: "উদাহরণ: " + p.examples.join("  •  ") }));
+    const ex = p.exercise;
+    const q = el("div", { class: "mt" }, [
+      el("div", { style: "font-size:16px", text: ex.sentence.replace("___", "____") })
+    ]);
+    const opts = el("div", { class: "mt" });
+    ex.options.forEach(opt => {
+      opts.appendChild(el("button", {
+        class: "opt", text: opt, onclick: (e) => {
+          const ok = opt === ex.answer;
+          e.target.classList.add(ok ? "correct" : "wrong");
+          recordPattern(p.id, ok);
+          Array.from(opts.children).forEach(b => b.disabled = true);
+          const fb = el("div", { class: "feedback " + (ok ? "ok" : "no"), text: ok ? "✓ ঠিক!" : "✗ সঠিক: " + ex.answer });
+          q.appendChild(fb);
+          box.querySelector(".ring-wrap").replaceWith(ring(patternMastery(p.id), p.pattern.split(" ")[1] || p.id));
+          updateGlobalProgress();
+        }
+      }));
+    });
+    const meaningToggle = el("button", {
+      class: "btn small mt", text: "বাংলা অর্থ দেখো", onclick: (e) => {
+        e.target.style.display = "none";
+        q.appendChild(el("div", { class: "bn", style: "color:#8b949e;margin-top:6px", text: "→ " + p.meaning }));
+      }
+    });
+    box.appendChild(q); box.appendChild(opts); box.appendChild(meaningToggle);
+    return box;
+  }
+
   function renderC() {
+    const reset = el("button", {
+      class: "btn small danger", text: "রিসেট",
+      onclick: () => {
+        if (!confirm("ব্যাকরণের অগ্রগতি মুছে যাবে। নিশ্চিত?")) return;
+        store.set("grammar", {});
+        renderC(); updateGlobalProgress(); toast("রিসেট হয়েছে");
+      }
+    });
     const head = el("div", {}, [
       el("h2", { html: 'C · <span class="bn">ব্যাকরণ ও বাক্য প্যাটার্ন</span>' }),
-      el("div", { class: "sub bn", text: "১৫টি মূল প্যাটার্ন। ফাঁকা স্থান পূরণ করে নিজেই চেক করো।" })
+      el("div", { class: "row" }, [
+        el("div", { class: "sub bn", text: "১৫টি মূল প্যাটার্ন। ফাঁকা স্থান পূরণ করে নিজেই চেক করো।" }),
+        el("span", { class: "spacer" }),
+        reset
+      ])
     ]);
     const list = el("div", {});
-    C.PATTERNS.forEach(p => {
-      const box = el("div", { class: "card", style: "text-align:left;margin:10px 0;padding:14px" });
-      box.appendChild(el("div", { class: "row" }, [
-        el("div", {}, [
-          el("div", { style: "font-weight:700;color:#58a6ff", text: p.pattern }),
-          el("div", { class: "bn", style: "color:#8b949e;font-size:13px", text: p.meaning })
-        ]),
-        el("span", { class: "spacer" }),
-        ring(patternMastery(p.id), p.pattern.split(" ")[1] || p.id)
-      ]));
-      box.appendChild(el("div", { class: "bn", style: "color:#8b949e;font-size:12px;margin:8px 0", text: "উদাহরণ: " + p.examples.join("  •  ") }));
-
-      const ex = p.exercise;
-      const q = el("div", { class: "mt" }, [
-        el("div", { style: "font-size:16px", text: ex.sentence.replace("___", "____") })
-      ]);
-      const opts = el("div", { class: "mt" });
-      ex.options.forEach(opt => {
-        opts.appendChild(el("button", {
-          class: "opt", text: opt, onclick: (e) => {
-            const ok = opt === ex.answer;
-            e.target.classList.add(ok ? "correct" : "wrong");
-            recordPattern(p.id, ok);
-            Array.from(opts.children).forEach(b => b.disabled = true);
-            const fb = el("div", { class: "feedback " + (ok ? "ok" : "no"), text: ok ? "✓ ঠিক!" : "✗ সঠিক: " + ex.answer });
-            q.appendChild(fb);
-            // refresh ring
-            box.querySelector(".ring-wrap").replaceWith(ring(patternMastery(p.id), p.pattern.split(" ")[1] || p.id));
-          }
-        }));
-      });
-      const meaningToggle = el("button", {
-        class: "btn small mt", text: "বাংলা অর্থ দেখো", onclick: (e) => {
-          e.target.style.display = "none";
-          q.appendChild(el("div", { class: "bn", style: "color:#8b949e;margin-top:6px", text: "→ " + p.meaning }));
-        }
-      });
-      box.appendChild(q); box.appendChild(opts); box.appendChild(meaningToggle);
-      list.appendChild(box);
-    });
+    // Daily drill — changes every day
+    const daily = C.PATTERNS[dayIndex() % C.PATTERNS.length];
+    const dailyCard = grammarCard(daily);
+    dailyCard.style.border = "1px solid #F2C14E";
+    list.appendChild(el("div", { class: "section-title bn", text: "আজকের অনুশীলন (Daily drill)" }));
+    list.appendChild(dailyCard);
+    list.appendChild(el("div", { class: "section-title bn", text: "সব প্যাটার্ন" }));
+    C.PATTERNS.forEach(p => list.appendChild(grammarCard(p)));
     setView([head, list]);
   }
 
@@ -517,47 +542,68 @@
     return wrap;
   }
 
+  function passageCard(p, i) {
+    const box = el("div", { class: "card", style: "text-align:left;margin:12px 0;padding:14px" });
+    const titleRow = el("div", { class: "row" }, [
+      el("div", { style: "font-weight:700;color:#58a6ff", text: (i + 1) + ". " + p.title }),
+      el("span", { class: "spacer" }),
+      el("span", { class: "bn", style: "color:#8b949e;font-size:12px", text: p.level })
+    ]);
+    if (passageMastery(i) > 0) titleRow.appendChild(ring(passageMastery(i), "বুঝেছি"));
+    box.appendChild(titleRow);
+    box.appendChild(renderPassageText(p.text));
+    const qs = el("div", { class: "mt" });
+    p.questions.forEach((qq, qi) => {
+      qs.appendChild(el("div", { class: "bn", style: "margin:8px 0", text: (i + 1) + "." + (qi + 1) + " " + qq.q }));
+      const o = el("div", {});
+      qq.options.forEach(op => {
+        o.appendChild(el("button", {
+          class: "opt", text: op, onclick: (e) => {
+            const ok = op === qq.answer;
+            e.target.classList.add(ok ? "correct" : "wrong");
+            recordPassage(i, ok);
+            Array.from(o.children).forEach(b => b.disabled = true);
+            const fb = el("div", { class: "feedback " + (ok ? "ok" : "no"), text: ok ? "✓ ঠিক!" : "✗ সঠিক: " + qq.answer });
+            qs.appendChild(fb);
+            const rw = box.querySelector(".ring-wrap");
+            if (rw) rw.replaceWith(ring(passageMastery(i), "বুঝেছি"));
+            else titleRow.appendChild(ring(passageMastery(i), "বুঝেছি"));
+            updateGlobalProgress();
+          }
+        }));
+      });
+      qs.appendChild(o);
+    });
+    box.appendChild(qs);
+    return box;
+  }
+
   function renderD() {
+    const reset = el("button", {
+      class: "btn small danger", text: "রিসেট",
+      onclick: () => {
+        if (!confirm("রিডিংয়ের অগ্রগতি মুছে যাবে। নিশ্চিত?")) return;
+        store.set("passages_seen", {});
+        renderD(); updateGlobalProgress(); toast("রিসেট হয়েছে");
+      }
+    });
     const head = el("div", {}, [
       el("h2", { html: 'D · <span class="bn">পড়া (Reading)</span>' }),
-      el("div", { class: "sub bn", text: "যেকোনো শব্দে ট্যাপ করে শোনো ও অর্থ দেখো।" })
+      el("div", { class: "row" }, [
+        el("div", { class: "sub bn", text: "যেকোনো শব্দে ট্যাপ করে শোনো ও অর্থ দেখো।" }),
+        el("span", { class: "spacer" }),
+        reset
+      ])
     ]);
     const list = el("div", {});
-    C.PASSAGES.forEach((p, i) => {
-      const box = el("div", { class: "card", style: "text-align:left;margin:12px 0;padding:14px" });
-      const titleRow = el("div", { class: "row" }, [
-        el("div", { style: "font-weight:700;color:#58a6ff", text: (i + 1) + ". " + p.title }),
-        el("span", { class: "spacer" }),
-        el("span", { class: "bn", style: "color:#8b949e;font-size:12px", text: p.level })
-      ]);
-      if (passageMastery(i) > 0) titleRow.appendChild(ring(passageMastery(i), "বুঝেছি"));
-      box.appendChild(titleRow);
-      box.appendChild(renderPassageText(p.text));
-      const qs = el("div", { class: "mt" });
-      p.questions.forEach((qq, qi) => {
-        qs.appendChild(el("div", { class: "bn", style: "margin:8px 0", text: (i + 1) + "." + (qi + 1) + " " + qq.q }));
-        const o = el("div", {});
-        qq.options.forEach(op => {
-          o.appendChild(el("button", {
-            class: "opt", text: op, onclick: (e) => {
-              const ok = op === qq.answer;
-              e.target.classList.add(ok ? "correct" : "wrong");
-              recordPassage(i, ok);
-              Array.from(o.children).forEach(b => b.disabled = true);
-              const fb = el("div", { class: "feedback " + (ok ? "ok" : "no"), text: ok ? "✓ ঠিক!" : "✗ সঠিক: " + qq.answer });
-              qs.appendChild(fb);
-              const rw = box.querySelector(".ring-wrap");
-              if (rw) rw.replaceWith(ring(passageMastery(i), "বুঝেছি"));
-              else titleRow.appendChild(ring(passageMastery(i), "বুঝেছি"));
-              updateGlobalProgress();
-            }
-          }));
-        });
-        qs.appendChild(o);
-      });
-      box.appendChild(qs);
-      list.appendChild(box);
-    });
+    // Passage of the day — changes every day
+    const di = dayIndex() % C.PASSAGES.length;
+    const dailyCard = passageCard(C.PASSAGES[di], di);
+    dailyCard.style.border = "1px solid #F2C14E";
+    list.appendChild(el("div", { class: "section-title bn", text: "আজকের পড়া (Passage of the day)" }));
+    list.appendChild(dailyCard);
+    list.appendChild(el("div", { class: "section-title bn", text: "সব প্যাসেজ" }));
+    C.PASSAGES.forEach((p, i) => list.appendChild(passageCard(p, i)));
 
     // placeholder: paste own README
     const pasteHead = el("div", { class: "section-title bn", text: "নিজের প্রজেক্টের README এখানে paste করে practice করো" });
@@ -599,9 +645,9 @@
       targetLine.textContent = sentences[idx];
       drill.querySelector("#sr-btn").disabled = false;
     }
-    const listenBtn = el("button", { class: "btn blue", text: "🔊 শোনো", onclick: () => speak(sentences[idx]) });
+    const listenBtn = el("button", { class: "btn blue", html: SPK_SVG + " শোনো", onclick: () => speak(sentences[idx]) });
     const srBtn = el("button", {
-      class: "btn primary", id: "sr-btn", text: "🎤 বলো", onclick: () => doRecognition(sentences[idx], srOut, srBtn)
+      class: "btn primary", id: "sr-btn", html: MIC_SVG + " বলো", onclick: () => doRecognition(sentences[idx], srOut, srBtn)
     });
     const nextBtn = el("button", { class: "btn", text: "পরবর্তী →", onclick: () => { idx = (idx + 1) % sentences.length; showTarget(); } });
     drill.appendChild(el("div", { class: "section-title bn", text: "Shadowing drill (ছায়া অনুশীলন)" }));
@@ -648,7 +694,7 @@
     rec.interimResults = false;
     rec.maxAlternatives = 1;
     btn.disabled = true;
-    btn.textContent = "🎤 শুনছি...";
+    btn.innerHTML = MIC_SVG + " শুনছি...";
     outNode.appendChild(el("div", { class: "bn", style: "color:#8b949e", text: "বলো..." }));
 
     rec.onresult = (ev) => {
@@ -658,7 +704,7 @@
     rec.onerror = (ev) => {
       outNode.appendChild(el("div", { class: "feedback no", text: "ভুল: " + ev.error + " — ইন্টারনেট/মাইক চেক করো" }));
     };
-    rec.onend = () => { btn.disabled = false; btn.textContent = "🎤 বলো"; };
+    rec.onend = () => { btn.disabled = false; btn.innerHTML = MIC_SVG + " বলো"; };
     rec.start();
   }
 
@@ -868,7 +914,7 @@
   function renderH() {
     const head = el("div", {}, [
       el("h2", { html: 'H · <span class="bn">কথোপকথন (Conversation)</span>' }),
-      el("div", { class: "sub bn", text: "পরিস্থিতি বাছো → পার্টনার বলবে → তুমি উত্তর দাও (চিপে ট্যাপ করো বা 🎤 বলো) → পার্টনার উত্তর/প্রশ্ন করবে।" })
+      el("div", { class: "sub bn", html: "পরিস্থিতি বাছো → পার্টনার বলবে → তুমি উত্তর দাও (চিপে ট্যাপ করো বা " + MIC_SVG + " বলো) → পার্টনার উত্তর/প্রশ্ন করবে।" })
     ]);
     const wrap = el("div", {});
 
@@ -919,7 +965,7 @@
           el("div", { class: "txt", text: text }),
           bnLine,
           el("div", { class: "acts" }, [
-            el("button", { class: "btn small", text: "🔊", title: "শোনো", onclick: () => speak(text) }),
+            el("button", { class: "btn small", html: SPK_SVG, title: "শোনো", onclick: () => speak(text) }),
             el("button", { class: "btn small", text: "বাংলা", onclick: (e) => { const s = bnLine.style.display === "none"; bnLine.style.display = s ? "block" : "none"; e.target.textContent = s ? "ইংরেজি" : "বাংলা"; } })
           ])
         ]);
@@ -962,8 +1008,8 @@
       }
 
       const controls = el("div", { class: "row mt" }, [
-        el("button", { class: "btn primary", text: "🎤 বলো (মাইক)", onclick: () => { if (!busy) listenUser(transcript => reply(null, transcript)); } }),
-        el("button", { class: "btn", text: "🔊 আবার শোনো", onclick: () => { const n = conv.nodes[currentId]; if (n) speak(n.bot); } })
+        el("button", { class: "btn primary", html: MIC_SVG + " বলো (মাইক)", onclick: () => { if (!busy) listenUser(transcript => reply(null, transcript)); } }),
+        el("button", { class: "btn", html: SPK_SVG + " আবার শোনো", onclick: () => { const n = conv.nodes[currentId]; if (n) speak(n.bot); } })
       ]);
       wrap.appendChild(controls);
 

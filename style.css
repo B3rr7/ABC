@@ -135,6 +135,8 @@ h2 .bn{ color:var(--muted); font-size:15px; font-family:var(--bn); }
   cursor:pointer; font-size:14px; flex:0 0 auto;
 }
 .speak:active{ transform:scale(.9); }
+.ico{ display:inline-flex; align-items:center; justify-content:center; line-height:0; }
+button .ico{ margin-right:2px; vertical-align:middle; }
 
 .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
 .spacer{ flex:1; }
