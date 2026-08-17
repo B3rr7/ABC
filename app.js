@@ -448,7 +448,9 @@
       el("span", { class: "spacer" }),
       ring(patternMastery(p.id), p.pattern.split(" ")[1] || p.id)
     ]));
-    box.appendChild(el("div", { class: "bn", style: "color:#8b949e;font-size:12px;margin:8px 0", text: "উদাহরণ: " + p.examples.join("  •  ") }));
+    const exLine = el("div", { class: "bn blur-text", style: "color:#8b949e;font-size:12px;margin:8px 0", text: "উদাহরণ: " + p.examples.join("  •  ") });
+    exLine.addEventListener("click", () => exLine.classList.add("revealed"));
+    box.appendChild(exLine);
     const ex = p.exercise;
     const q = el("div", { class: "mt" }, [
       el("div", { style: "font-size:16px", text: ex.sentence.replace("___", "____") })

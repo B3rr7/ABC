@@ -137,6 +137,8 @@ h2 .bn{ color:var(--muted); font-size:15px; font-family:var(--bn); }
 .speak:active{ transform:scale(.9); }
 .ico{ display:inline-flex; align-items:center; justify-content:center; line-height:0; }
 button .ico{ margin-right:2px; vertical-align:middle; }
+.blur-text{ filter:blur(5px); cursor:pointer; user-select:none; transition:filter .2s; }
+.blur-text.revealed{ filter:none; }
 
 .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
 .spacer{ flex:1; }
