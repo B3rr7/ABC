@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>english.compile() — Rani's Learning Pipeline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== HERO / TERMINAL ===== -->
+  <header class="hero">
+    <div class="eyebrow">west bengal — english/compile.md</div>
+    <h1 class="title"><span class="fn">english</span><span class="paren">.compile(</span>rani<span class="paren">)</span></h1>
+    <p class="subtitle">
+      A self-contained build pipeline for learning English from zero — speaking first, reading and writing tech content close behind. No apps, no accounts, all in the browser.
+      <span class="bn">তোমার লক্ষ্য: কথা বলা প্রধান, সাথে reading/writing — বিশেষ করে technology-related ইংরেজি সহজে বোঝা আর লেখা।</span>
+    </p>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <span>build.log</span>
+      </div>
+      <div class="terminal-body" id="bootlog"></div>
+    </div>
+  </header>
+
+  <!-- ===== STICKY PROGRESS BAR ===== -->
+  <div class="progresswrap">
+    <span class="label">PIPELINE PROGRESS</span>
+    <div class="progressbar"><div class="progressbar-fill" id="fill"></div></div>
+    <span class="pct" id="pct">0%</span>
+  </div>
+
+  <!-- ===== MODULE NAV (terminal tabs) ===== -->
+  <nav class="tabbar" id="tabbar">
+    <button class="tab active" data-mod="A">A · <span class="bn">বর্ণমালা</span></button>
+    <button class="tab" data-mod="B">B · <span class="bn">শব্দ</span></button>
+    <button class="tab" data-mod="C">C · <span class="bn">ব্যাকরণ</span></button>
+    <button class="tab" data-mod="D">D · <span class="bn">পড়া</span></button>
+    <button class="tab" data-mod="E">E · <span class="bn">কথা</span></button>
+    <button class="tab" data-mod="F">F · <span class="bn">লেখা</span></button>
+    <button class="tab" data-mod="G">G · <span class="bn">ড্যাশবোর্ড</span></button>
+  </nav>
+
+  <main id="view" class="view"></main>
+
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <script src="content.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
