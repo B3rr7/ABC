@@ -265,8 +265,8 @@ window.EC_CONTENT = (function () {
     },
     {
       id: "p20", pattern: "I used to ___", meaning: "আমি আগে ___ করতাম (past habit)",
-      examples: ["I used to smoke.", "I used to live in Dhaka.", "I used to play cricket."],
-      exercise: { sentence: "I used to ___ in Dhaka.", blank: true, options: ["live", "lived", "living", "lives"], answer: "live" }
+      examples: ["I used to smoke.", "I used to live in Kolkata.", "I used to play cricket."],
+      exercise: { sentence: "I used to ___ in Kolkata.", blank: true, options: ["live", "lived", "living", "lives"], answer: "live" }
     }
   ];
 
