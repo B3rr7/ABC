@@ -182,7 +182,7 @@
       .replace(/she's/g, "she is").replace(/'ll\b/g, " will").replace(/'ve\b/g, " have")
       .replace(/'re\b/g, " are").replace(/n't\b/g, " not")
       .replace(/gonna/g, "going to").replace(/wanna/g, "want to").replace(/gotta/g, "got to")
-      .replace(/k\b/g, "okay").replace(/yeah|yep|yup/g, "yes").replace(/nope|nah/g, "no");
+      .replace(/\bk\b/g, "okay").replace(/yeah|yep|yup/g, "yes").replace(/nope|nah/g, "no");
     return s.replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
   }
   // synonym expansion so loosely-worded speech still matches intents
@@ -366,7 +366,7 @@
           const heard = normalize(transcript);
           const ok = heard.split(" ").indexOf(target) !== -1 || heard.indexOf(target) !== -1;
           srOut.appendChild(el("div", { class: "feedback " + (ok ? "ok" : "no"), text: (ok ? "✓ ঠিক উচ্চারণ! " : "শুনলাম: ") + transcript }));
-        });
+        }, recBtn);
       }
     });
     const rates = el("div", { class: "row mt", style: "justify-content:center;flex-wrap:wrap" }, [
@@ -718,6 +718,7 @@
     };
     rec.onerror = (ev) => {
       outNode.appendChild(el("div", { class: "feedback no", text: "ভুল: " + ev.error + " — ইন্টারনেট/মাইক চেক করো" }));
+      btn.disabled = false; btn.innerHTML = MIC_SVG + " বলো";
     };
     rec.onend = () => { btn.disabled = false; btn.innerHTML = MIC_SVG + " বলো"; };
     rec.start();
@@ -743,12 +744,15 @@
     outNode.appendChild(wrap);
   }
 
-  function listenUser(cb) {
+  function listenUser(cb, btn) {
     if (!SR) { toast("মাইক সাপোর্টেড নয় — Chrome (Android/Desktop) ব্যবহার করো।"); return; }
     const rec = new SR();
     rec.lang = "en-US"; rec.interimResults = false; rec.maxAlternatives = 1;
-    rec.onresult = (e) => cb(e.results[0][0].transcript);
-    rec.onerror = (e) => toast("ভুল: " + e.error + " — ইন্টারনেট/মাইক চেক করো");
+    const orig = btn ? btn.innerHTML : "";
+    if (btn) { btn.disabled = true; btn.innerHTML = MIC_SVG + " শুনছি..."; }
+    const restore = () => { if (btn) { btn.disabled = false; btn.innerHTML = orig; } };
+    rec.onresult = (e) => { cb(e.results[0][0].transcript); restore(); };
+    rec.onerror = (e) => { toast("ভুল: " + e.error + " — ইন্টারনেট/মাইক চেক করো"); restore(); };
     rec.start();
   }
 
@@ -1022,8 +1026,9 @@
         }, 500);
       }
 
+      const micBtn = el("button", { class: "btn primary", html: MIC_SVG + " বলো (মাইক)", onclick: () => { if (!busy) listenUser(transcript => reply(null, transcript), micBtn); } });
       const controls = el("div", { class: "row mt" }, [
-        el("button", { class: "btn primary", html: MIC_SVG + " বলো (মাইক)", onclick: () => { if (!busy) listenUser(transcript => reply(null, transcript)); } }),
+        micBtn,
         el("button", { class: "btn", html: SPK_SVG + " আবার শোনো", onclick: () => { const n = conv.nodes[currentId]; if (n) speak(n.bot); } })
       ]);
       wrap.appendChild(controls);
@@ -1041,6 +1046,7 @@
   const MODULES = { A: renderA, B: renderB, C: renderC, D: renderD, E: renderE, F: renderF, G: renderG, H: renderH };
   function go(mod) {
     hidePopover();
+    if (synth) synth.cancel();
     document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.mod === mod));
     (MODULES[mod] || renderA)();
     updateGlobalProgress();
