@@ -820,48 +820,83 @@
   function renderH() {
     const head = el("div", {}, [
       el("h2", { html: 'H · <span class="bn">কথোপকথন (Conversation)</span>' }),
-      el("div", { class: "sub bn", text: "দৈনন্দিন কথোপকথন — লাইনে ট্যাপ করে শোনো, বাংলা দেখো, আর মাইক দিয়ে প্র্যাকটিস করো।" })
+      el("div", { class: "sub bn", text: "একটা পরিস্থিতি বাছো → কথাটা শোনো → তোমার লাইনটা মাইকে বলো।" })
     ]);
-    const list = el("div", {});
-    C.CONVERSATIONS.forEach((conv, ci) => {
-      const card = el("div", { class: "card conv", style: "text-align:left;margin:12px 0;padding:14px" });
-      card.appendChild(el("div", { class: "row" }, [
-        el("div", { style: "font-weight:700;color:#58a6ff", text: (ci + 1) + ". " + conv.title }),
-        el("span", { class: "spacer" }),
-        el("span", { class: "bn", style: "color:#8b949e;font-size:12px", text: conv.en })
-      ]));
-      conv.lines.forEach(line => {
-        const bnLine = el("div", { class: "bn", style: "color:#8b949e;font-size:13px;margin-top:3px;display:none", text: line.bn });
-        const row = el("div", { class: "conv-line", onclick: () => speak(line.en) }, [
-          el("span", { class: "conv-who", text: line.who + ": " }),
-          el("span", { text: line.en }),
-          el("span", { class: "spacer" }),
-          speaker(line.en)
+    const wrap = el("div", {});
+
+    function renderMenu() {
+      clear(wrap);
+      const list = el("div", {});
+      C.CONVERSATIONS.forEach((conv, ci) => {
+        const done = !!store.get("conv_seen", {})[ci];
+        const card = el("div", { class: "card", style: "text-align:left;padding:14px;margin:10px 0;cursor:pointer", onclick: () => renderPlayer(ci) }, [
+          el("div", { class: "row" }, [
+            el("div", { style: "font-weight:700;color:#58a6ff", text: (ci + 1) + ". " + conv.title }),
+            el("span", { class: "spacer" }),
+            el("span", { class: "bn", style: "color:#8b949e;font-size:12px", text: conv.en })
+          ]),
+          el("div", { class: "bn", style: "color:#8b949e;font-size:13px;margin-top:6px", text: done ? "✓ প্র্যাকটিস করেছো" : "ট্যাপ করে শুরু করো →" })
         ]);
-        const bnToggle = el("button", {
-          class: "btn small mt", text: "বাংলা", onclick: (e) => {
-            const show = bnLine.style.display === "none";
-            bnLine.style.display = show ? "block" : "none";
-            e.target.textContent = show ? "ইংরেজি" : "বাংলা";
-          }
-        });
-        card.appendChild(el("div", { class: "conv-block" }, [row, bnLine, bnToggle]));
+        list.appendChild(card);
       });
-      const srOut = el("div", { class: "mt" });
-      const practiceBtn = el("button", {
-        class: "btn primary mt", text: "🎤 প্র্যাকটিস করো",
-        onclick: () => {
-          const pick = conv.lines[Math.floor(Math.random() * conv.lines.length)];
-          recordConv(ci);
-          updateGlobalProgress();
-          doRecognition(pick.en, srOut, practiceBtn);
-        }
+      wrap.appendChild(list);
+    }
+
+    function renderPlayer(ci) {
+      const conv = C.CONVERSATIONS[ci];
+      clear(wrap);
+      wrap.appendChild(el("div", { class: "row mb" }, [
+        el("button", { class: "btn small", text: "← ফিরে", onclick: renderMenu }),
+        el("span", { class: "spacer" }),
+        el("div", { style: "font-weight:700;color:#58a6ff", text: conv.title + " · " + conv.en })
+      ]));
+
+      const chat = el("div", {});
+      const resultNode = el("div", { class: "mt" });
+
+      function practiceLine(target, btn) {
+        recordConv(ci);
+        updateGlobalProgress();
+        doRecognition(target, resultNode, btn);
+      }
+
+      conv.lines.forEach(line => {
+        const isYou = line.who === "তুমি";
+        const bnLine = el("div", { class: "bn", style: "font-size:12px;margin-top:4px;display:none", text: line.bn });
+        const acts = el("div", { class: "acts" }, [
+          el("button", { class: "btn small", text: "🔊", title: "শোনো", onclick: () => speak(line.en) }),
+          el("button", { class: "btn small", text: "বাংলা", onclick: (e) => {
+            const s = bnLine.style.display === "none";
+            bnLine.style.display = s ? "block" : "none";
+            e.target.textContent = s ? "ইংরেজি" : "বাংলা";
+          } })
+        ]);
+        if (isYou) acts.appendChild(el("button", { class: "btn small primary", text: "🎤 আমি বলব", onclick: (e) => practiceLine(line.en, e.target) }));
+        const bubble = el("div", { class: "bubble " + (isYou ? "you" : "them") }, [
+          el("div", { class: "who", text: line.who }),
+          el("div", { class: "txt", text: line.en }),
+          bnLine,
+          acts
+        ]);
+        chat.appendChild(bubble);
       });
-      card.appendChild(practiceBtn);
-      card.appendChild(srOut);
-      list.appendChild(card);
-    });
-    setView([head, list]);
+      chat.appendChild(resultNode);
+      wrap.appendChild(chat);
+
+      wrap.appendChild(el("div", { class: "row mt" }, [
+        el("button", { class: "btn blue", text: "🔊 পুরো কথাটা শোনো", onclick: () => {
+          if (!synth) { toast("এই ব্রাউজারে শব্দ চলবে না"); return; }
+          conv.lines.forEach(l => {
+            const u = new SpeechSynthesisUtterance(l.en);
+            u.lang = "en-US"; u.rate = 0.9;
+            synth.speak(u);
+          });
+        } })
+      ]));
+    }
+
+    renderMenu();
+    setView([head, wrap]);
   }
 
   /* ============================================================
