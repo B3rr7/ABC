@@ -48,6 +48,36 @@
     toastTimer = setTimeout(() => $toast.classList.remove("show"), 2200);
   }
 
+  /* ---------------- storage availability check ---------------- */
+  function showStorageWarning() {
+    if (document.getElementById("storage-warn")) return;
+    const banner = el("div", {
+      id: "storage-warn",
+      style: "position:fixed;top:0;left:0;right:0;z-index:60;background:#F26D6D;color:#0B0E14;font-family:var(--bn);font-size:13px;padding:10px 14px;display:flex;align-items:center;gap:12px;"
+    }, [
+      el("span", { style: "flex:1", text: "এই ব্রাউজারে প্রগ্রেস সেভ হচ্ছে না — Incognito/Private mode বন্ধ করে সাধারণ ব্রাউজারে ব্যবহার করো।" }),
+      el("button", {
+        text: "✕", title: "বন্ধ করো",
+        style: "background:transparent;border:1px solid #0B0E14;border-radius:4px;cursor:pointer;font-family:monospace;padding:2px 8px;",
+        onclick: () => banner.remove()
+      })
+    ]);
+    document.body.appendChild(banner);
+  }
+  function checkStorage() {
+    const testKey = NS + "__storage_test__";
+    try {
+      localStorage.setItem(testKey, "1");
+      const ok = localStorage.getItem(testKey) === "1";
+      localStorage.removeItem(testKey);
+      if (!ok) throw new Error("read mismatch");
+      return true;
+    } catch (e) {
+      showStorageWarning();
+      return false;
+    }
+  }
+
   /* ---------------- boot terminal log ---------------- */
   function bootLog() {
     const lines = [
@@ -84,10 +114,15 @@
     const diaryAll = store.get("diary_all", {});
     const diaryCount = Object.keys(diaryAll).length;
     const streak = store.get("streak", { count: 0 }).count;
+    const passages = store.get("passages_seen", {});
+    let seenCount = 0;
+    for (const k in passages) if (passages[k].attempts > 0) seenCount++;
+    const pasTotal = C.PASSAGES.length;
     const pct = (learned / totalVocab) * 40 +
       (patAttempts / patTotal) * 30 +
-      (Math.min(diaryCount, 14) / 14) * 15 +
-      (Math.min(streak, 30) / 30) * 15;
+      (seenCount / pasTotal) * 6 +
+      (Math.min(diaryCount, 14) / 14) * 12 +
+      (Math.min(streak, 30) / 30) * 12;
     return Math.max(0, Math.min(100, Math.round(pct)));
   }
   function updateGlobalProgress() {
@@ -212,6 +247,27 @@
     st.count = (st.last === y) ? st.count + 1 : 1;
     st.last = t;
     store.set("streak", st);
+  }
+
+  function recordPassage(idx, ok) {
+    const m = store.get("passages_seen", {});
+    m[idx] = m[idx] || { attempts: 0, correct: 0 };
+    m[idx].attempts += 1;
+    if (ok) m[idx].correct += 1;
+    store.set("passages_seen", m);
+  }
+  function passageMastery(idx) {
+    const m = store.get("passages_seen", {});
+    const p = m[idx];
+    if (!p || p.attempts === 0) return 0;
+    return Math.round((p.correct / p.attempts) * 100);
+  }
+  function recordSpeaking() {
+    store.set("speaking_sessions", store.get("speaking_sessions", 0) + 1);
+    store.set("speaking_last", todayStr());
+  }
+  function recordShadowing() {
+    store.set("shadowing_count", store.get("shadowing_count", 0) + 1);
   }
 
   let reviewQueue = [];
@@ -425,11 +481,13 @@
     const list = el("div", {});
     C.PASSAGES.forEach((p, i) => {
       const box = el("div", { class: "card", style: "text-align:left;margin:12px 0;padding:14px" });
-      box.appendChild(el("div", { class: "row" }, [
+      const titleRow = el("div", { class: "row" }, [
         el("div", { style: "font-weight:700;color:#58a6ff", text: (i + 1) + ". " + p.title }),
         el("span", { class: "spacer" }),
         el("span", { class: "bn", style: "color:#8b949e;font-size:12px", text: p.level })
-      ]));
+      ]);
+      if (passageMastery(i) > 0) titleRow.appendChild(ring(passageMastery(i), "বুঝেছি"));
+      box.appendChild(titleRow);
       box.appendChild(renderPassageText(p.text));
       const qs = el("div", { class: "mt" });
       p.questions.forEach((qq, qi) => {
@@ -440,9 +498,14 @@
             class: "opt", text: op, onclick: (e) => {
               const ok = op === qq.answer;
               e.target.classList.add(ok ? "correct" : "wrong");
+              recordPassage(i, ok);
               Array.from(o.children).forEach(b => b.disabled = true);
               const fb = el("div", { class: "feedback " + (ok ? "ok" : "no"), text: ok ? "✓ ঠিক!" : "✗ সঠিক: " + qq.answer });
               qs.appendChild(fb);
+              const rw = box.querySelector(".ring-wrap");
+              if (rw) rw.replaceWith(ring(passageMastery(i), "বুঝেছি"));
+              else titleRow.appendChild(ring(passageMastery(i), "বুঝেছি"));
+              updateGlobalProgress();
             }
           }));
         });
@@ -515,7 +578,7 @@
           const m = String(Math.floor(sec / 60)).padStart(2, "0");
           const s = String(sec % 60).padStart(2, "0");
           timer.textContent = m + ":" + s;
-          if (sec <= 0) { clearInterval(talkInt); toast("সময় শেষ! ভালো করেছো।"); startBtn.disabled = false; }
+          if (sec <= 0) { clearInterval(talkInt); toast("সময় শেষ! ভালো করেছো।"); recordSpeaking(); startBtn.disabled = false; }
         }, 1000);
       }
     });
@@ -556,6 +619,7 @@
 
   function showMatch(target, heard, outNode) {
     clear(outNode);
+    recordShadowing();
     const tWords = normalize(target).split(" ");
     const hWords = normalize(heard).split(" ");
     const hSet = new Set(hWords);
@@ -658,6 +722,9 @@
     for (const id in grammar) { patTotal++; if (grammar[id].attempts > 0) patternsDone++; }
     const diaryAll = store.get("diary_all", {});
     const diaryCount = Object.keys(diaryAll).length;
+    const passages = store.get("passages_seen", {});
+    let seenCount = 0;
+    for (const k in passages) if (passages[k].attempts > 0) seenCount++;
 
     const head = el("div", {}, [
       el("h2", { html: 'G · <span class="bn">ড্যাশবোর্ড / অগ্রগতি</span>' }),
@@ -668,9 +735,57 @@
       tile(learned, "শব্দ শেখা"),
       tile(due, "আজ রিভিউ বাকি"),
       tile(patternsDone + "/" + C.PATTERNS.length, "প্যাটার্ন"),
-      tile(C.PASSAGES.length, "পাসেজ পড়া"),
-      tile(diaryCount, "ডায়েরি লেখা")
+      tile(seenCount + "/" + C.PASSAGES.length, "পাসেজ পড়া"),
+      tile(diaryCount, "ডায়েরি লেখা"),
+      tile(store.get("speaking_sessions", 0), "স্পিকিং সেশন"),
+      tile(store.get("shadowing_count", 0), "শ্যাডোইং")
     ]);
+
+    // backup / restore
+    function exportProgress() {
+      const data = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith(NS)) data[k] = localStorage.getItem(k);
+      }
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "english-compile-backup-" + new Date().toISOString().slice(0, 10) + ".json";
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+      toast("ব্যাকআপ ডাউনলোড হয়েছে (" + Object.keys(data).length + " keys)");
+    }
+    const fileInput = el("input", {
+      type: "file", accept: ".json", style: "display:none",
+      onchange: (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        const fr = new FileReader();
+        fr.onload = () => {
+          try {
+            const obj = JSON.parse(fr.result);
+            let n = 0;
+            for (const k in obj) {
+              if (k.startsWith(NS)) { localStorage.setItem(k, obj[k]); n++; }
+            }
+            toast(n + " টি key রিস্টোর হয়েছে");
+            renderG();
+            updateGlobalProgress();
+          } catch (err) { toast("ফাইল ঠিক নয় — পার্স করা যায়নি"); }
+        };
+        fr.readAsText(f);
+        e.target.value = "";
+      }
+    });
+
+    const backupRow = el("div", { class: "row mt" }, [
+      el("button", { class: "btn", text: "প্রগ্রেস এক্সপোর্ট করো", onclick: exportProgress }),
+      el("button", { class: "btn", text: "প্রগ্রেস ইম্পোর্ট করো", onclick: () => fileInput.click() }),
+      fileInput
+    ]);
+
     const reset = el("button", {
       class: "btn danger mt", text: "সব অগ্রগতি মুছে ফেলো (Reset)",
       onclick: () => {
@@ -681,7 +796,7 @@
         updateGlobalProgress();
       }
     });
-    setView([head, tiles, reset]);
+    setView([head, tiles, el("div", { class: "section-title bn", text: "ব্যাকআপ / রিস্টোর" }), backupRow, reset]);
   }
   function tile(num, lbl) {
     return el("div", { class: "tile" }, [
@@ -706,6 +821,7 @@
   });
 
   // init
+  checkStorage();
   bootLog();
   if (!synth) toast("শব্দের জন্য speechSynthesis পাওয়া যায়নি");
   go("A");
