@@ -43,6 +43,14 @@
   const SPK_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4.03v8.06A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06a9 9 0 0 0 0-17.54z"/></svg>';
   const MIC_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>';
   function dayIndex() { return Math.floor(Date.now() / 86400000); }
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
   function seededShuffle(arr, seed) {
     const a = arr.slice();
     let s = (seed >>> 0) || 1;
@@ -645,12 +653,18 @@
       el("div", { class: "note-box bn", html: "<b>নোট:</b> Speech Recognition-এর জন্য Chrome (ডেস্কটপ বা Android) ও ইন্টারনেট লাগে। বাকি পেজ অফলাইনেই কাজ করে।" })
     ]);
 
-    // Shadowing drill — sentences from C patterns + D passages
-    const sentences = [];
+    // Shadowing drill — sentences from C patterns + D passages, shuffled so the order is random each session and never repeats until all are shown
+    let sentences = [];
     C.PATTERNS.forEach(p => p.examples.forEach(e => sentences.push(e)));
     C.PASSAGES.forEach(p => sentences.push(p.text));
     C.CONVERSATIONS.forEach(c => c.lines.forEach(l => sentences.push(l.en)));
+    sentences = shuffle(sentences);
     let idx = 0;
+    function goNext() {
+      idx += 1;
+      if (idx >= sentences.length) { sentences = shuffle(sentences); idx = 0; }
+      showTarget();
+    }
 
     const drill = el("div", { class: "card", style: "text-align:left;padding:16px;margin:12px 0" });
     const targetLine = el("div", { style: "font-size:18px;margin:8px 0;color:#2ea043;font-weight:700" });
@@ -662,9 +676,9 @@
     }
     const listenBtn = el("button", { class: "btn blue", html: SPK_SVG + " শোনো", onclick: () => speak(sentences[idx]) });
     const srBtn = el("button", {
-      class: "btn primary", id: "sr-btn", html: MIC_SVG + " বলো", onclick: () => doRecognition(sentences[idx], srOut, srBtn, () => { idx = (idx + 1) % sentences.length; showTarget(); })
+      class: "btn primary", id: "sr-btn", html: MIC_SVG + " বলো", onclick: () => doRecognition(sentences[idx], srOut, srBtn, goNext)
     });
-    const nextBtn = el("button", { class: "btn", text: "পরবর্তী →", onclick: () => { idx = (idx + 1) % sentences.length; showTarget(); } });
+    const nextBtn = el("button", { class: "btn", text: "পরবর্তী →", onclick: goNext });
     drill.appendChild(el("div", { class: "section-title bn", text: "Shadowing drill (ছায়া অনুশীলন)" }));
     drill.appendChild(targetLine);
     drill.appendChild(el("div", { class: "row mt" }, [listenBtn, srBtn, nextBtn]));
