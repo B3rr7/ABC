@@ -269,6 +269,11 @@
   function recordShadowing() {
     store.set("shadowing_count", store.get("shadowing_count", 0) + 1);
   }
+  function recordConv(idx) {
+    const m = store.get("conv_seen", {});
+    m[idx] = true;
+    store.set("conv_seen", m);
+  }
 
   let reviewQueue = [];
   function renderB() {
@@ -544,6 +549,7 @@
     const sentences = [];
     C.PATTERNS.forEach(p => p.examples.forEach(e => sentences.push(e)));
     C.PASSAGES.forEach(p => sentences.push(p.text));
+    C.CONVERSATIONS.forEach(c => c.lines.forEach(l => sentences.push(l.en)));
     let idx = 0;
 
     const drill = el("div", { class: "card", style: "text-align:left;padding:16px;margin:12px 0" });
@@ -725,6 +731,8 @@
     const passages = store.get("passages_seen", {});
     let seenCount = 0;
     for (const k in passages) if (passages[k].attempts > 0) seenCount++;
+    const convSeen = store.get("conv_seen", {});
+    const convCount = Object.keys(convSeen).length;
 
     const head = el("div", {}, [
       el("h2", { html: 'G · <span class="bn">ড্যাশবোর্ড / অগ্রগতি</span>' }),
@@ -738,7 +746,8 @@
       tile(seenCount + "/" + C.PASSAGES.length, "পাসেজ পড়া"),
       tile(diaryCount, "ডায়েরি লেখা"),
       tile(store.get("speaking_sessions", 0), "স্পিকিং সেশন"),
-      tile(store.get("shadowing_count", 0), "শ্যাডোইং")
+      tile(store.get("shadowing_count", 0), "শ্যাডোইং"),
+      tile(convCount + "/" + C.CONVERSATIONS.length, "কথোপকথন")
     ]);
 
     // backup / restore
@@ -806,9 +815,59 @@
   }
 
   /* ============================================================
-     Router
-     ============================================================ */
-  const MODULES = { A: renderA, B: renderB, C: renderC, D: renderD, E: renderE, F: renderF, G: renderG };
+      MODULE H — Daily Conversations
+      ============================================================ */
+  function renderH() {
+    const head = el("div", {}, [
+      el("h2", { html: 'H · <span class="bn">কথোপকথন (Conversation)</span>' }),
+      el("div", { class: "sub bn", text: "দৈনন্দিন কথোপকথন — লাইনে ট্যাপ করে শোনো, বাংলা দেখো, আর মাইক দিয়ে প্র্যাকটিস করো।" })
+    ]);
+    const list = el("div", {});
+    C.CONVERSATIONS.forEach((conv, ci) => {
+      const card = el("div", { class: "card conv", style: "text-align:left;margin:12px 0;padding:14px" });
+      card.appendChild(el("div", { class: "row" }, [
+        el("div", { style: "font-weight:700;color:#58a6ff", text: (ci + 1) + ". " + conv.title }),
+        el("span", { class: "spacer" }),
+        el("span", { class: "bn", style: "color:#8b949e;font-size:12px", text: conv.en })
+      ]));
+      conv.lines.forEach(line => {
+        const bnLine = el("div", { class: "bn", style: "color:#8b949e;font-size:13px;margin-top:3px;display:none", text: line.bn });
+        const row = el("div", { class: "conv-line", onclick: () => speak(line.en) }, [
+          el("span", { class: "conv-who", text: line.who + ": " }),
+          el("span", { text: line.en }),
+          el("span", { class: "spacer" }),
+          speaker(line.en)
+        ]);
+        const bnToggle = el("button", {
+          class: "btn small mt", text: "বাংলা", onclick: (e) => {
+            const show = bnLine.style.display === "none";
+            bnLine.style.display = show ? "block" : "none";
+            e.target.textContent = show ? "ইংরেজি" : "বাংলা";
+          }
+        });
+        card.appendChild(el("div", { class: "conv-block" }, [row, bnLine, bnToggle]));
+      });
+      const srOut = el("div", { class: "mt" });
+      const practiceBtn = el("button", {
+        class: "btn primary mt", text: "🎤 প্র্যাকটিস করো",
+        onclick: () => {
+          const pick = conv.lines[Math.floor(Math.random() * conv.lines.length)];
+          recordConv(ci);
+          updateGlobalProgress();
+          doRecognition(pick.en, srOut, practiceBtn);
+        }
+      });
+      card.appendChild(practiceBtn);
+      card.appendChild(srOut);
+      list.appendChild(card);
+    });
+    setView([head, list]);
+  }
+
+  /* ============================================================
+      Router
+      ============================================================ */
+  const MODULES = { A: renderA, B: renderB, C: renderC, D: renderD, E: renderE, F: renderF, G: renderG, H: renderH };
   function go(mod) {
     hidePopover();
     document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.mod === mod));

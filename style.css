@@ -222,3 +222,14 @@ textarea{
 
 .section-title{ color:var(--cyan); font-family:var(--mono); margin:18px 0 8px; font-size:15px; letter-spacing:.04em; }
 hr.sep{ border:none; border-top:1px solid var(--line); margin:18px 0; }
+
+/* conversation module */
+.conv-block{ margin:8px 0; }
+.conv-line{
+  display:flex; align-items:center; gap:8px; padding:9px 10px;
+  border:1px solid var(--line); border-radius:8px; background:var(--surface-2);
+  cursor:pointer; margin-top:6px; transition:.12s;
+}
+.conv-line:active{ border-color:var(--cyan); }
+.conv-who{ color:var(--amber); font-weight:700; font-family:var(--bn); flex:0 0 auto; }
+.conv-line .spacer{ flex:1; }

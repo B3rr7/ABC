@@ -289,11 +289,94 @@ window.EC_CONTENT = (function () {
 
   /* ---------- Module E: Speaking prompts ---------- */
   const FREE_TALK_PROMPTS = [
+    "একটা মেয়ের সাথে কথা শুরু করো (Start a talk with a girl)",
+    "কফি শপে অর্ডার করো (Order at a coffee shop)",
+    "বন্ধুর সাথে আড্ডা (Chat with a friend)",
+    "কাউকে কমপ্লিমেন্ট দাও (Give someone a compliment)",
+    "ছুটির পরিকল্পনা জিজ্ঞেস করো (Ask about weekend plans)",
     "আজকের কাজ সম্পর্কে বলো (Talk about today's work)",
     "উইকেন্ড প্ল্যান (Weekend plans)",
     "তোমার প্রিয় টুল/ভাষা (Your favorite tool/language)",
     "একটা বাগ ঠিক করার গল্প (A story about fixing a bug)",
     "তুমি কী শিখছ (What you are learning)"
+  ];
+
+  /* ---------- Module H: Daily Conversations ---------- */
+  // each: { title (bn), en (scene), lines: [{who, en, bn}] }
+  const CONVERSATIONS = [
+    {
+      title: "বন্ধুর সাথে আড্ডা", en: "Small talk with a friend",
+      lines: [
+        { who: "তুমি", en: "Hey! How are you today?", bn: "হাই! আজ তুমি কেমন আছো?" },
+        { who: "বন্ধু", en: "I'm good, thanks. And you?", bn: "আমি ভালো, ধন্যবাদ। আর তুমি?" },
+        { who: "তুমি", en: "I'm great. The weather is nice.", bn: "আমি দারুণ। আবহাওয়া ভালো।" },
+        { who: "বন্ধু", en: "Yes, let's sit outside.", bn: "হ্যাঁ, চলো বাইরে বসি।" }
+      ]
+    },
+    {
+      title: "একটা মেয়ের সাথে কথা", en: "Talking with a girl",
+      lines: [
+        { who: "তুমি", en: "Hi, I'm Rani. What's your name?", bn: "হাই, আমি রানি। তোমার নাম কী?" },
+        { who: "মেয়ে", en: "I'm Aisha. Nice to meet you.", bn: "আমি আয়শা। তোমাকে জানতে ভালো লাগলো।" },
+        { who: "তুমি", en: "Nice to meet you too. Do you like this cafe?", bn: "আমারও। তুমি এই কাফেটা পছন্দ করো?" },
+        { who: "মেয়ে", en: "Yes, the coffee is really good.", bn: "হ্যাঁ, কফিটা খুব ভালো।" },
+        { who: "তুমি", en: "Cool. Can I sit with you?", bn: "দারুণ। আমি তোমার সাথে বসতে পারি?" }
+      ]
+    },
+    {
+      title: "কফি শপে", en: "At a coffee shop",
+      lines: [
+        { who: "তুমি", en: "Hi, can I get a latte, please?", bn: "হাই, একটা লেট পাবো?" },
+        { who: "বেরিস্তা", en: "Sure. Small or large?", bn: "অবশ্যই। ছোট নাকি বড়?" },
+        { who: "তুমি", en: "Large, please.", bn: "বড়, দয়া করে।" },
+        { who: "বেরিস্তা", en: "Anything else?", bn: "আর কিছু?" },
+        { who: "তুমি", en: "No, that's all. Thank you.", bn: "না, এটুকুই। ধন্যবাদ।" }
+      ]
+    },
+    {
+      title: "ছুটির পরিকল্পনা", en: "Weekend plans",
+      lines: [
+        { who: "তুমি", en: "What are you doing this weekend?", bn: "এই সপ্তাহান্তে তুমি কী করছো?" },
+        { who: "বন্ধু", en: "Maybe a movie. Want to join?", bn: "হয়তো সিনেমা। যোগ দেবে?" },
+        { who: "তুমি", en: "Sure! What time?", bn: "অবশ্যই! কটায়?" },
+        { who: "বন্ধু", en: "Saturday, 7 pm.", bn: "শনিবার, সন্ধ্যা ৭টায়।" }
+      ]
+    },
+    {
+      title: "পথ চাওয়া", en: "Asking for directions",
+      lines: [
+        { who: "তুমি", en: "Excuse me, where is the station?", bn: "সরি, স্টেশন কোথায়?" },
+        { who: "পথচারী", en: "Go straight, then turn left.", bn: "সোজা যাও, তারপর বামে ঘুরো।" },
+        { who: "তুমি", en: "Thank you very much!", bn: "খুব ধন্যবাদ!" },
+        { who: "পথচারী", en: "You're welcome.", bn: "নাহ, ধন্যবাদ নয়।" }
+      ]
+    },
+    {
+      title: "প্রশংসা করা", en: "Giving a compliment",
+      lines: [
+        { who: "তুমি", en: "I love your dress!", bn: "তোমার ড্রেসটা খুব সুন্দর!" },
+        { who: "মেয়ে", en: "Oh, thank you!", bn: "ওহ, ধন্যবাদ!" },
+        { who: "তুমি", en: "Where did you get it?", bn: "কোথা থেকে নিয়েছো?" },
+        { who: "মেয়ে", en: "From the market nearby.", bn: "কাছের বাজার থেকে।" }
+      ]
+    },
+    {
+      title: "ফোনে কথা", en: "On the phone",
+      lines: [
+        { who: "তুমি", en: "Hello, is Rina there?", bn: "হ্যালো, রিনা আছে?" },
+        { who: "সহকর্মী", en: "She's busy right now.", bn: "সে এখন ব্যস্ত।" },
+        { who: "তুমি", en: "Okay, I'll call later.", bn: "ঠিক আছে, পরে ফোন করবো।" },
+        { who: "সহকর্মী", en: "Sure, bye.", bn: "ঠিক আছে, বাই।" }
+      ]
+    },
+    {
+      title: "বিদায়", en: "Saying goodbye",
+      lines: [
+        { who: "তুমি", en: "It was nice meeting you.", bn: "তোমাকে জানতে ভালো লাগলো।" },
+        { who: "মেয়ে", en: "Same here. See you soon!", bn: "আমারও। শিগগির দেখা হবে!" },
+        { who: "তুমি", en: "Take care. Bye!", bn: "ভালো থেকো। বাই!" }
+      ]
+    }
   ];
 
   /* ---------- Module F: Writing ---------- */
@@ -321,6 +404,6 @@ window.EC_CONTENT = (function () {
 
   return {
     ALPHABET, COMMON_WORDS, VOCAB, PATTERNS, PASSAGES, GLOSS,
-    FREE_TALK_PROMPTS, COMMIT_PRACTICE, COMMON_MISTAKES
+    FREE_TALK_PROMPTS, CONVERSATIONS, COMMIT_PRACTICE, COMMON_MISTAKES
   };
 })();
