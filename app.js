@@ -159,8 +159,32 @@
   }
 
   function normalize(s) {
-    return (s || "").toLowerCase().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ").trim();
+    s = (s || "").toLowerCase();
+    s = s
+      .replace(/i'm/g, "i am").replace(/don't/g, "do not").replace(/can't/g, "cannot")
+      .replace(/won't/g, "will not").replace(/ain't/g, "is not").replace(/it's/g, "it is")
+      .replace(/that's/g, "that is").replace(/let's/g, "let us").replace(/he's/g, "he is")
+      .replace(/she's/g, "she is").replace(/'ll\b/g, " will").replace(/'ve\b/g, " have")
+      .replace(/'re\b/g, " are").replace(/n't\b/g, " not")
+      .replace(/gonna/g, "going to").replace(/wanna/g, "want to").replace(/gotta/g, "got to")
+      .replace(/k\b/g, "okay").replace(/yeah|yep|yup/g, "yes").replace(/nope|nah/g, "no");
+    return s.replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
   }
+  // synonym expansion so loosely-worded speech still matches intents
+  const SYN = {
+    sure: "yes", great: "good", fine: "good", nice: "good", okay: "yes",
+    bad: "not good", tired: "not good", sick: "not good", sad: "not good",
+    movie: "cinema", film: "cinema", latte: "coffee", tea: "coffee", water: "coffee",
+    busy: "not free", later: "not now"
+  };
+  function expandSyn(s) {
+    return normalize(s).split(" ").map(w => SYN[w] || w).join(" ");
+  }
+  // filler / grammar words ignored when scoring spoken accuracy
+  const STOP = new Set(["a", "an", "the", "is", "are", "am", "to", "of", "in", "on", "and",
+    "or", "but", "i", "you", "he", "she", "it", "we", "they", "my", "your", "um", "uh",
+    "er", "so", "just", "that", "this", "with", "for", "me", "at", "be", "do", "does",
+    "have", "has", "will", "can", "would", "could", "should", "not", "good", "yes", "no"]);
   function todayStr() { return new Date().toISOString().slice(0, 10); }
 
   /* ============================================================
@@ -317,13 +341,28 @@
         }
       })
     ]);
-    const rates = el("div", { class: "row mt", style: "justify-content:center" }, [
+    const srOut = el("div", { class: "mt" });
+    const recBtn = el("button", {
+      class: "btn small", text: "🎤 উচ্চারণ চেক",
+      onclick: () => {
+        listenUser(transcript => {
+          clear(srOut);
+          const target = normalize(w.en);
+          const heard = normalize(transcript);
+          const ok = heard.split(" ").indexOf(target) !== -1 || heard.indexOf(target) !== -1;
+          srOut.appendChild(el("div", { class: "feedback " + (ok ? "ok" : "no"), text: (ok ? "✓ ঠিক উচ্চারণ! " : "শুনলাম: ") + transcript }));
+        });
+      }
+    });
+    const rates = el("div", { class: "row mt", style: "justify-content:center;flex-wrap:wrap" }, [
       el("button", { class: "btn danger", text: "আবার (Again)", onclick: () => grade(w, 1) }),
       el("button", { class: "btn warn", text: "কঠিন (Hard)", onclick: () => grade(w, 3) }),
-      el("button", { class: "btn primary", text: "সহজ (Easy)", onclick: () => grade(w, 5) })
+      el("button", { class: "btn primary", text: "সহজ (Easy)", onclick: () => grade(w, 5) }),
+      recBtn
     ]);
     area.appendChild(card);
     area.appendChild(rates);
+    area.appendChild(srOut);
   }
 
   function grade(w, q) {
@@ -626,26 +665,35 @@
   function showMatch(target, heard, outNode) {
     clear(outNode);
     recordShadowing();
-    const tWords = normalize(target).split(" ");
-    const hWords = normalize(heard).split(" ");
-    const hSet = new Set(hWords);
+    const tAll = normalize(target).split(" ");
+    const hSet = new Set(normalize(heard).split(" "));
+    const tWords = tAll.filter(w => !STOP.has(w));
     const wrap = el("div", { class: "sr-result" });
     wrap.appendChild(el("div", { class: "bn", style: "color:#8b949e", text: "তুমি বলেছো: " + heard }));
     const line = el("div", { style: "margin-top:6px;font-size:16px" });
-    tWords.forEach(w => {
+    tAll.forEach(w => {
       const ok = hSet.has(w);
       line.appendChild(el("span", { class: "word " + (ok ? "ok" : "bad"), text: w + " " }));
     });
     wrap.appendChild(line);
     const matched = tWords.filter(w => hSet.has(w)).length;
-    const pct = Math.round((matched / tWords.length) * 100);
+    const pct = tWords.length ? Math.round((matched / tWords.length) * 100) : 100;
     wrap.appendChild(el("div", { class: "feedback " + (pct >= 70 ? "ok" : "no"), text: (pct >= 70 ? "✓ চমৎকার! " : "আরেকবার চেষ্টা করো ") + "(" + pct + "%)" }));
     outNode.appendChild(wrap);
   }
 
+  function listenUser(cb) {
+    if (!SR) { toast("মাইক সাপোর্টেড নয় — Chrome (Android/Desktop) ব্যবহার করো।"); return; }
+    const rec = new SR();
+    rec.lang = "en-US"; rec.interimResults = false; rec.maxAlternatives = 1;
+    rec.onresult = (e) => cb(e.results[0][0].transcript);
+    rec.onerror = (e) => toast("ভুল: " + e.error + " — ইন্টারনেট/মাইক চেক করো");
+    rec.start();
+  }
+
   /* ============================================================
-     MODULE F — Writing
-     ============================================================ */
+      MODULE F — Writing
+      ============================================================ */
   function renderF() {
     const head = el("div", {}, [
       el("h2", { html: 'F · <span class="bn">লেখা (Writing)</span>' }),
@@ -824,20 +872,11 @@
     ]);
     const wrap = el("div", {});
 
-    function listenUser(cb) {
-      if (!SR) { toast("মাইক সাপোর্টেড নয় — Chrome (Android/Desktop) ব্যবহার করো।"); return; }
-      const rec = new SR();
-      rec.lang = "en-US"; rec.interimResults = false; rec.maxAlternatives = 1;
-      rec.onresult = (e) => cb(e.results[0][0].transcript);
-      rec.onerror = (e) => toast("ভুল: " + e.error + " — ইন্টারনেট/মাইক চেক করো");
-      rec.start();
-    }
-
     function matchOption(transcript, options) {
-      const t = normalize(transcript);
+      const t = expandSyn(transcript);
       for (const o of options) {
         if (o.hear.indexOf("*") !== -1) return o;
-        if (o.hear.some(k => t.indexOf(normalize(k)) !== -1)) return o;
+        if (o.hear.some(k => t.indexOf(expandSyn(k)) !== -1)) return o;
       }
       return options[options.length - 1];
     }

@@ -135,6 +135,36 @@ window.EC_CONTENT = (function () {
     ]
   };
 
+  // extra vocabulary (expanded word bank)
+  VOCAB.daily.push(
+    { en: "eat", bn: "খাওয়া" }, { en: "sleep", bn: "ঘুম" }, { en: "run", bn: "দৌড়" },
+    { en: "walk", bn: "হাঁটা" }, { en: "read", bn: "পড়া" }, { en: "write", bn: "লেখা" },
+    { en: "speak", bn: "কথা বলা" }, { en: "listen", bn: "শোনা" }, { en: "love", bn: "ভালোবাসা" },
+    { en: "hate", bn: "ঘৃণা" }, { en: "need", bn: "প্রয়োজন" }, { en: "sit", bn: "বসা" },
+    { en: "stand", bn: "দাঁড়ানো" }, { en: "open", bn: "খোলা" }, { en: "close", bn: "বন্ধ" },
+    { en: "sell", bn: "বিক্রি" }, { en: "pay", bn: "দেওয়া" }, { en: "cost", bn: "দাম" },
+    { en: "cheap", bn: "সস্তা" }, { en: "expensive", bn: "দামি" }, { en: "near", bn: "কাছে" },
+    { en: "far", bn: "দূরে" }, { en: "fast", bn: "দ্রুত" }, { en: "slow", bn: "ধীরে" },
+    { en: "early", bn: "সকালে/আগে" }, { en: "late", bn: "দেরি" }, { en: "clean", bn: "পরিষ্কার" },
+    { en: "dirty", bn: "নোংরা" }, { en: "big", bn: "বড়" }, { en: "small", bn: "ছোট" },
+    { en: "old", bn: "পুরনো" }, { en: "young", bn: "তরুণ" }, { en: "beautiful", bn: "সুন্দর" },
+    { en: "laugh", bn: "হাসা" }, { en: "cry", bn: "কাঁদা" }, { en: "wait", bn: "অপেক্ষা" },
+    { en: "meet", bn: "দেখা" }, { en: "call", bn: "ফোন/ডাক" }, { en: "watch", bn: "দেখা" },
+    { en: "play", bn: "খেলা" }, { en: "game", bn: "খেলা" }
+  );
+  VOCAB.tech.push(
+    { en: "css", bn: "সিএসএস" }, { en: "html", bn: "এইচটিএমএল" }, { en: "json", bn: "জেসন" },
+    { en: "linux", bn: "লিনাক্স" }, { en: "git", bn: "গিট" }, { en: "ssh", bn: "এসএসএসএইচ" },
+    { en: "http", bn: "এইচটিটিপি" }, { en: "url", bn: "ইউআরএল" }, { en: "domain", bn: "ডোমেইন" },
+    { en: "host", bn: "হোস্ট" }, { en: "client", bn: "ক্লায়েন্ট" }, { en: "frontend", bn: "ফ্রন্টএন্ড" },
+    { en: "backend", bn: "ব্যাকএন্ড" }, { en: "latency", bn: "লেটেন্সি" }, { en: "proxy", bn: "প্রক্সি" },
+    { en: "encrypt", bn: "এনক্রিপ্ট" }, { en: "decrypt", bn: "ডিক্রিপ্ট" }, { en: "container", bn: "কন্টেইনার" },
+    { en: "image", bn: "ইমেজ" }, { en: "pod", bn: "পড" }, { en: "widget", bn: "উইজেট" },
+    { en: "plugin", bn: "প্লাগিন" }, { en: "middleware", bn: "মিডলওয়্যার" }, { en: "bandwidth", bn: "ব্যান্ডউইথ" },
+    { en: "packet", bn: "প্যাকেট" }, { en: "socket", bn: "সকেট" }, { en: "enum", bn: "এনাম" },
+    { en: "generic", bn: "জেনেরিক" }
+  );
+
   /* ---------- Module C: Grammar & Sentence Patterns ---------- */
   // each pattern: id, pattern, meaning (bn), examples[], exercise {sentence, blank, options[], answer}
   const PATTERNS = [
