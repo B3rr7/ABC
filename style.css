@@ -231,3 +231,4 @@ hr.sep{ border:none; border-top:1px solid var(--line); margin:18px 0; }
 .bubble.you .who{ color:var(--amber); }
 .bubble .txt{ font-size:15px; }
 .bubble .acts{ display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+.conv-chat{ max-height:58vh; overflow:auto; padding:4px 2px; }

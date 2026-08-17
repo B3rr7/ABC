@@ -402,8 +402,118 @@ window.EC_CONTENT = (function () {
     "There/their/they're — অর্থ ও বানান গুলিয়ে ফেলা"
   ];
 
+  /* ---------- Module H: Interactive conversation trees ---------- */
+  // branching dialogue: partner says `bot`, user replies via mic or chip;
+  // reply is matched by `hear` keywords -> partner responds with `say` (and asks next via `goto`).
+  const CONV_TREES = [
+    {
+      title: "একটা মেয়ের সাথে কথা", en: "Talking with a girl",
+      start: "a",
+      nodes: {
+        a: { bot: "Hi, I'm Rani. What's your name?", bn: "হাই, আমি রানি। তোমার নাম কী?",
+          options: [
+            { you: "My name is...", hear: ["my name", "i am", "i'm", "name is"], say: "Nice to meet you! Do you come here often?", bn: "তোমাকে জানতে ভালো লাগলো! তুমি কি এখানে নিয়মিত আসো?" },
+            { you: "(সাধারণ উত্তর)", hear: ["*"], say: "Haha, nice to meet you! Do you come here often?", bn: "হাহা, তোমাকে জানতে ভালো লাগলো! তুমি কি এখানে নিয়মিত আসো?" }
+          ] },
+        b: { bot: "Do you come here often?", bn: "তুমি কি এখানে নিয়মিত আসো?",
+          options: [
+            { you: "Yes, often", hear: ["yes", "yeah", "often", "always", "every"], say: "Me too! The coffee here is really good. Can I sit with you?", bn: "আমিও! এখানকার কফি খুব ভালো। আমি তোমার সাথে বসতে পারি?" },
+            { you: "No, first time", hear: ["no", "not", "first", "never"], say: "Me neither, first time. But the coffee is good. Can I sit with you?", bn: "আমিও না, প্রথমবার। তবে কফি ভালো। আমি তোমার সাথে বসতে পারি?" },
+            { you: "(অন্য কিছু)", hear: ["*"], say: "Oh okay. The coffee is good though. Can I sit with you?", bn: "ওহ ঠিক আছে। কফি ভালো। আমি তোমার সাথে বসতে পারি?" }
+          ] },
+        c: { bot: "Can I sit with you?", bn: "আমি তোমার সাথে বসতে পারি?",
+          options: [
+            { you: "Sure, please", hear: ["yes", "sure", "okay", "please", "why not"], say: "Great! So, what do you do for work?", bn: "দারুণ! তাহলে, তুমি কী কাজ করো?" },
+            { you: "Sorry, I'm busy", hear: ["no", "busy", "later"], say: "No worries! Maybe another time. Bye!", bn: "কোনো সমস্যা নয়! হয়তো আরেকদিন। বাই!", end: true },
+            { you: "(অন্য কিছু)", hear: ["*"], say: "Great! So, what do you do for work?", bn: "দারুণ! তাহলে, তুমি কী কাজ করো?" }
+          ] },
+        d: { bot: "What do you do for work?", bn: "তুমি কী কাজ করো?",
+          options: [
+            { you: "(যা কাজ করো)", hear: ["*"], say: "That's cool! Nice talking to you. See you around!", bn: "এটা দারুণ! তোমার সাথে কথা বলে ভালো লাগলো। পরে দেখা হবে!", end: true }
+          ] }
+      }
+    },
+    {
+      title: "বন্ধুর সাথে আড্ডা", en: "Small talk with a friend",
+      start: "s1",
+      nodes: {
+        s1: { bot: "Hey! How are you today?", bn: "হাই! আজ তুমি কেমন আছো?",
+          options: [
+            { you: "I'm good, thanks", hear: ["good", "fine", "great", "well", "okay"], say: "I'm great too. The weather is nice, right?", bn: "আমিও দারুণ। আবহাওয়া ভালো, তাই না?" },
+            { you: "Not so good", hear: ["not", "bad", "tired", "sick", "sad"], say: "Oh no, what happened? Hope you feel better.", bn: "ওহ না, কী হয়েছে? আশা করি ভালো হয়ে যাবে।" },
+            { you: "(সাধারণ)", hear: ["*"], say: "I'm great too. The weather is nice, right?", bn: "আমিও দারুণ। আবহাওয়া ভালো, তাই না?" }
+          ] },
+        s2: { bot: "The weather is nice, right?", bn: "আবহাওয়া ভালো, তাই না?",
+          options: [
+            { you: "Yes, it's nice", hear: ["yes", "yeah", "nice", "sunny"], say: "Let's sit outside and chat!", bn: "চলো বাইরে বসে আড্ডা দিই!", end: true },
+            { you: "Not really", hear: ["no", "not", "cold", "hot"], say: "Haha, maybe inside then. Chat with me!", bn: "হাহা, তাহলে ভেতরে। আমার সাথে আড্ডা দাও!", end: true },
+            { you: "(সাধারণ)", hear: ["*"], say: "Let's sit outside and chat!", bn: "চলো বাইরে বসে আড্ডা দিই!", end: true }
+          ] }
+      }
+    },
+    {
+      title: "কফি শপে", en: "At a coffee shop",
+      start: "c1",
+      nodes: {
+        c1: { bot: "Hi, what can I get for you?", bn: "হাই, আপনাকে কী দেব?",
+          options: [
+            { you: "A latte, please", hear: ["latte", "coffee", "tea", "cappuccino"], say: "Sure! Small or large?", bn: "অবশ্যই! ছোট নাকি বড়?" },
+            { you: "Just water", hear: ["water"], say: "Okay, coming right up!", bn: "ঠিক আছে, একদম আনছি!", end: true },
+            { you: "I'll look first", hear: ["*"], say: "No rush, take your time.", bn: "তাড়া নেই, সময় নাও।" }
+          ] },
+        c2: { bot: "Small or large?", bn: "ছোট নাকি বড়?",
+          options: [
+            { you: "Large, please", hear: ["large", "big"], say: "Great. Anything else?", bn: "দারুণ। আর কিছু?" },
+            { you: "Small", hear: ["small"], say: "Great. Anything else?", bn: "দারুণ। আর কিছু?" },
+            { you: "(মাঝারি)", hear: ["*"], say: "Great. Anything else?", bn: "দারুণ। আর কিছু?" }
+          ] },
+        c3: { bot: "Anything else?", bn: "আর কিছু?",
+          options: [
+            { you: "No, that's all", hear: ["no", "nothing", "all", "that's"], say: "Perfect, that'll be 4 taka. Thank you!", bn: "দারুণ, ৪ টাকা হবে। ধন্যবাদ!", end: true },
+            { you: "Yes, a cake", hear: ["yes", "cake", "cookie", "muffin"], say: "Sure! That'll be 6 taka. Thank you!", bn: "অবশ্যই! ৬ টাকা হবে। ধন্যবাদ!", end: true },
+            { you: "(সাধারণ)", hear: ["*"], say: "Perfect, that'll be 4 taka. Thank you!", bn: "দারুণ, ৪ টাকা হবে। ধন্যবাদ!", end: true }
+          ] }
+      }
+    },
+    {
+      title: "ছুটির পরিকল্পনা", en: "Weekend plans",
+      start: "w1",
+      nodes: {
+        w1: { bot: "What are you doing this weekend?", bn: "এই সপ্তাহান্তে তুমি কী করছো?",
+          options: [
+            { you: "Maybe a movie", hear: ["movie", "cinema", "film"], say: "Nice! Want to join me?", bn: "সুন্দর! আমার সাথে যোগ দেবে?" },
+            { you: "Nothing much", hear: ["nothing", "rest", "home", "not"], say: "Then come with me to a movie!", bn: "তাহলে আমার সাথে সিনেমায় চলো!" },
+            { you: "I'll see", hear: ["*"], say: "Maybe a movie? Want to join me?", bn: "হয়তো সিনেমা? আমার সাথে যোগ দেবে?" }
+          ] },
+        w2: { bot: "Want to join me?", bn: "আমার সাথে যোগ দেবে?",
+          options: [
+            { you: "Sure, what time?", hear: ["sure", "yes", "okay", "time"], say: "Saturday, 7 pm. Deal?", bn: "শনিবার, সন্ধ্যা ৭টায়। ঠিক আছে?" },
+            { you: "Sorry, busy", hear: ["busy", "sorry", "no", "can't"], say: "No worries, another time! Bye!", bn: "কোনো সমস্যা নয়, আরেকদিন! বাই!", end: true },
+            { you: "Maybe", hear: ["*"], say: "Saturday, 7 pm. Deal?", bn: "শনিবার, সন্ধ্যা ৭টায়। ঠিক আছে?" }
+          ] },
+        w3: { bot: "Saturday, 7 pm. Deal?", bn: "শনিবার, সন্ধ্যা ৭টায়। ঠিক আছে?",
+          options: [
+            { you: "Deal! See you", hear: ["deal", "yes", "see", "okay"], say: "Awesome, see you Saturday!", bn: "দারুণ, শনিবার দেখা হবে!", end: true },
+            { you: "Let me check", hear: ["*"], say: "Sure, text me later. Bye!", bn: "ঠিক আছে, পরে মেসেজ দিও। বাই!", end: true }
+          ] }
+      }
+    },
+    {
+      title: "পথ চাওয়া", en: "Asking for directions",
+      start: "d1",
+      nodes: {
+        d1: { bot: "Excuse me, where is the station?", bn: "সরি, স্টেশন কোথায়?",
+          options: [
+            { you: "Go straight, then left", hear: ["straight", "left", "right", "turn"], say: "Thank you very much!", bn: "খুব ধন্যবাদ!" },
+            { you: "Sorry, I don't know", hear: ["don't", "no", "sorry", "not"], say: "That's okay, I'll ask someone else. Thanks!", bn: "কোনো সমস্যা নয়, অন্যজনকে জিজ্ঞেস করবো। ধন্যবাদ!", end: true },
+            { you: "I'm not sure", hear: ["*"], say: "No worries, thanks anyway!", bn: "কোনো সমস্যা নয়, ধন্যবাদ!", end: true }
+          ] }
+      }
+    }
+  ];
+
   return {
     ALPHABET, COMMON_WORDS, VOCAB, PATTERNS, PASSAGES, GLOSS,
-    FREE_TALK_PROMPTS, CONVERSATIONS, COMMIT_PRACTICE, COMMON_MISTAKES
+    FREE_TALK_PROMPTS, CONVERSATIONS, CONV_TREES, COMMIT_PRACTICE, COMMON_MISTAKES
   };
 })();

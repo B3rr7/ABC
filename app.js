@@ -747,7 +747,7 @@
       tile(diaryCount, "ডায়েরি লেখা"),
       tile(store.get("speaking_sessions", 0), "স্পিকিং সেশন"),
       tile(store.get("shadowing_count", 0), "শ্যাডোইং"),
-      tile(convCount + "/" + C.CONVERSATIONS.length, "কথোপকথন")
+      tile(convCount + "/" + C.CONV_TREES.length, "কথোপকথন")
     ]);
 
     // backup / restore
@@ -820,14 +820,32 @@
   function renderH() {
     const head = el("div", {}, [
       el("h2", { html: 'H · <span class="bn">কথোপকথন (Conversation)</span>' }),
-      el("div", { class: "sub bn", text: "একটা পরিস্থিতি বাছো → কথাটা শোনো → তোমার লাইনটা মাইকে বলো।" })
+      el("div", { class: "sub bn", text: "পরিস্থিতি বাছো → পার্টনার বলবে → তুমি উত্তর দাও (চিপে ট্যাপ করো বা 🎤 বলো) → পার্টনার উত্তর/প্রশ্ন করবে।" })
     ]);
     const wrap = el("div", {});
+
+    function listenUser(cb) {
+      if (!SR) { toast("মাইক সাপোর্টেড নয় — Chrome (Android/Desktop) ব্যবহার করো।"); return; }
+      const rec = new SR();
+      rec.lang = "en-US"; rec.interimResults = false; rec.maxAlternatives = 1;
+      rec.onresult = (e) => cb(e.results[0][0].transcript);
+      rec.onerror = (e) => toast("ভুল: " + e.error + " — ইন্টারনেট/মাইক চেক করো");
+      rec.start();
+    }
+
+    function matchOption(transcript, options) {
+      const t = normalize(transcript);
+      for (const o of options) {
+        if (o.hear.indexOf("*") !== -1) return o;
+        if (o.hear.some(k => t.indexOf(normalize(k)) !== -1)) return o;
+      }
+      return options[options.length - 1];
+    }
 
     function renderMenu() {
       clear(wrap);
       const list = el("div", {});
-      C.CONVERSATIONS.forEach((conv, ci) => {
+      C.CONV_TREES.forEach((conv, ci) => {
         const done = !!store.get("conv_seen", {})[ci];
         const card = el("div", { class: "card", style: "text-align:left;padding:14px;margin:10px 0;cursor:pointer", onclick: () => renderPlayer(ci) }, [
           el("div", { class: "row" }, [
@@ -843,7 +861,8 @@
     }
 
     function renderPlayer(ci) {
-      const conv = C.CONVERSATIONS[ci];
+      const conv = C.CONV_TREES[ci];
+      let currentId = null, busy = false;
       clear(wrap);
       wrap.appendChild(el("div", { class: "row mb" }, [
         el("button", { class: "btn small", text: "← ফিরে", onclick: renderMenu }),
@@ -851,48 +870,65 @@
         el("div", { style: "font-weight:700;color:#58a6ff", text: conv.title + " · " + conv.en })
       ]));
 
-      const chat = el("div", {});
-      const resultNode = el("div", { class: "mt" });
-
-      function practiceLine(target, btn) {
-        recordConv(ci);
-        updateGlobalProgress();
-        doRecognition(target, resultNode, btn);
-      }
-
-      conv.lines.forEach(line => {
-        const isYou = line.who === "তুমি";
-        const bnLine = el("div", { class: "bn", style: "font-size:12px;margin-top:4px;display:none", text: line.bn });
-        const acts = el("div", { class: "acts" }, [
-          el("button", { class: "btn small", text: "🔊", title: "শোনো", onclick: () => speak(line.en) }),
-          el("button", { class: "btn small", text: "বাংলা", onclick: (e) => {
-            const s = bnLine.style.display === "none";
-            bnLine.style.display = s ? "block" : "none";
-            e.target.textContent = s ? "ইংরেজি" : "বাংলা";
-          } })
-        ]);
-        if (isYou) acts.appendChild(el("button", { class: "btn small primary", text: "🎤 আমি বলব", onclick: (e) => practiceLine(line.en, e.target) }));
-        const bubble = el("div", { class: "bubble " + (isYou ? "you" : "them") }, [
-          el("div", { class: "who", text: line.who }),
-          el("div", { class: "txt", text: line.en }),
-          bnLine,
-          acts
-        ]);
-        chat.appendChild(bubble);
-      });
-      chat.appendChild(resultNode);
+      const chat = el("div", { class: "conv-chat" });
       wrap.appendChild(chat);
 
-      wrap.appendChild(el("div", { class: "row mt" }, [
-        el("button", { class: "btn blue", text: "🔊 পুরো কথাটা শোনো", onclick: () => {
-          if (!synth) { toast("এই ব্রাউজারে শব্দ চলবে না"); return; }
-          conv.lines.forEach(l => {
-            const u = new SpeechSynthesisUtterance(l.en);
-            u.lang = "en-US"; u.rate = 0.9;
-            synth.speak(u);
-          });
-        } })
-      ]));
+      function botBubble(text, bn, autoplay) {
+        const bnLine = el("div", { class: "bn", style: "font-size:12px;margin-top:4px;display:none", text: bn });
+        const b = el("div", { class: "bubble them" }, [
+          el("div", { class: "who", text: "পার্টনার" }),
+          el("div", { class: "txt", text: text }),
+          bnLine,
+          el("div", { class: "acts" }, [
+            el("button", { class: "btn small", text: "🔊", title: "শোনো", onclick: () => speak(text) }),
+            el("button", { class: "btn small", text: "বাংলা", onclick: (e) => { const s = bnLine.style.display === "none"; bnLine.style.display = s ? "block" : "none"; e.target.textContent = s ? "ইংরেজি" : "বাংলা"; } })
+          ])
+        ]);
+        chat.appendChild(b);
+        chat.scrollTop = chat.scrollHeight;
+        if (autoplay) speak(text);
+        return b;
+      }
+
+      function showNode(id) {
+        busy = false;
+        currentId = id;
+        const node = conv.nodes[id];
+        const b = botBubble(node.bot, node.bn, true);
+        const chips = el("div", { class: "acts" });
+        node.options.forEach(opt => {
+          chips.appendChild(el("button", { class: "btn small", text: opt.you, onclick: () => { if (!busy) reply(opt, opt.you); } }));
+        });
+        b.appendChild(chips);
+      }
+
+      function reply(chosenOpt, transcript) {
+        if (busy) return;
+        busy = true;
+        const node = conv.nodes[currentId];
+        const opt = chosenOpt || matchOption(transcript, node.options);
+        const youText = chosenOpt ? chosenOpt.you : transcript;
+        chat.appendChild(el("div", { class: "bubble you" }, [ el("div", { class: "who", text: "তুমি" }), el("div", { class: "txt", text: youText }) ]));
+        chat.scrollTop = chat.scrollHeight;
+        setTimeout(() => {
+          botBubble(opt.say, opt.bn, true);
+          recordConv(ci); updateGlobalProgress();
+          if (opt.goto && conv.nodes[opt.goto]) {
+            setTimeout(() => showNode(opt.goto), 800);
+          } else {
+            chat.appendChild(el("div", { class: "note-box bn", html: "<b>কথা শেষ।</b> ← ফিরে গিয়ে আবার চেষ্টা করো।" }));
+            busy = false;
+          }
+        }, 500);
+      }
+
+      const controls = el("div", { class: "row mt" }, [
+        el("button", { class: "btn primary", text: "🎤 বলো (মাইক)", onclick: () => { if (!busy) listenUser(transcript => reply(null, transcript)); } }),
+        el("button", { class: "btn", text: "🔊 আবার শোনো", onclick: () => { const n = conv.nodes[currentId]; if (n) speak(n.bot); } })
+      ]);
+      wrap.appendChild(controls);
+
+      showNode(conv.start);
     }
 
     renderMenu();
