@@ -12,7 +12,7 @@ A single, self-contained static webpage that teaches English from **zero to conv
 |--------|-------------|--------------|
 | **A** | বর্ণমালা ও শব্দ | 26 letters (tap to hear name + example word) + the 100 most common English words with Bengali meanings. |
 | **B** | শব্দ (Vocabulary) | Spaced-repetition flashcards (SM-2 style) for ~250 daily-life + tech words. Tap **🎤 উচ্চারণ চেক** to practice pronunciation — the app listens and tells you if you said the word right. |
-| **C** | ব্যাকরণ (Grammar) | 15 core sentence patterns with fill-in-the-blank drills and a per-pattern mastery ring. A **Daily drill** highlights one pattern that rotates every day, plus a **রিসেট** button to clear grammar progress. |
+| **C** | ব্যাকরণ (Grammar) | 20 core sentence patterns with fill-in-the-blank drills and a per-pattern mastery ring. Options are **shuffled** and a **Daily drill** highlights a different pattern every day (in shuffled order), plus a **রিসেট** button to clear grammar progress. |
 | **D** | পড়া (Reading) | 6 tech-flavored passages; tap any word to hear it and see a Bengali gloss. A **Passage of the day** rotates daily, and a **রিসেট** button clears reading progress. Plus a box to paste your own README/docs. Comprehension questions are scored per passage. |
 | **E** | কথা (Speaking) | Shadowing drill (listen → speak → see word-by-word match) and a 5-minute free-talk timer. |
 | **F** | লেখা (Writing) | Daily diary (auto-saved per date), commit-message practice, and a self-review mistake checklist. |

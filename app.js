@@ -43,6 +43,16 @@
   const SPK_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4.03v8.06A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06a9 9 0 0 0 0-17.54z"/></svg>';
   const MIC_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>';
   function dayIndex() { return Math.floor(Date.now() / 86400000); }
+  function seededShuffle(arr, seed) {
+    const a = arr.slice();
+    let s = (seed >>> 0) || 1;
+    for (let i = a.length - 1; i > 0; i--) {
+      s = (s * 1664525 + 1013904223) >>> 0;
+      const j = s % (i + 1);
+      const t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
 
   /* ---------------- toast ---------------- */
   let toastTimer = null;
@@ -456,7 +466,8 @@
       el("div", { style: "font-size:16px", text: ex.sentence.replace("___", "____") })
     ]);
     const opts = el("div", { class: "mt" });
-    ex.options.forEach(opt => {
+    const optSeed = (dayIndex() * 131 + (p.id.charCodeAt(1) || 0)) >>> 0;
+    seededShuffle(ex.options, optSeed).forEach(opt => {
       opts.appendChild(el("button", {
         class: "opt", text: opt, onclick: (e) => {
           const ok = opt === ex.answer;
@@ -498,14 +509,15 @@
       ])
     ]);
     const list = el("div", {});
-    // Daily drill — changes every day
-    const daily = C.PATTERNS[dayIndex() % C.PATTERNS.length];
+    // Daily drill — a different pattern each day, in a shuffled (non-sequential) order
+    const dailyIdx = seededShuffle(C.PATTERNS.map((_, i) => i), dayIndex())[0];
+    const daily = C.PATTERNS[dailyIdx];
     const dailyCard = grammarCard(daily);
     dailyCard.style.border = "1px solid #F2C14E";
     list.appendChild(el("div", { class: "section-title bn", text: "আজকের অনুশীলন (Daily drill)" }));
     list.appendChild(dailyCard);
     list.appendChild(el("div", { class: "section-title bn", text: "সব প্যাটার্ন" }));
-    C.PATTERNS.forEach(p => list.appendChild(grammarCard(p)));
+    seededShuffle(C.PATTERNS, dayIndex() * 7 + 3).forEach(p => list.appendChild(grammarCard(p)));
     setView([head, list]);
   }
 

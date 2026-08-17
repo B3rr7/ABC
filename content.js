@@ -242,6 +242,31 @@ window.EC_CONTENT = (function () {
       id: "p15", pattern: "Because ___", meaning: "কারণ ___",
       examples: ["Because it is broken.", "Because I was busy.", "Because the test failed."],
       exercise: { sentence: "Because the test ___", blank: true, options: ["failed", "fail", "failing", "fails"], answer: "failed" }
+    },
+    {
+      id: "p16", pattern: "I have been ___-ing", meaning: "আমি এতক্ষণ ___ করছি (present perfect continuous)",
+      examples: ["I have been learning.", "I have been waiting.", "I have been coding."],
+      exercise: { sentence: "I have been ___ all day.", blank: true, options: ["coding", "code", "coded", "codes"], answer: "coding" }
+    },
+    {
+      id: "p17", pattern: "If I ___ , I would ___", meaning: "যদি আমি ___ হতাম, আমি ___ (second conditional)",
+      examples: ["If I were rich, I would travel.", "If I had time, I would help.", "If I knew, I would tell you."],
+      exercise: { sentence: "If I ___ rich, I would travel.", blank: true, options: ["were", "am", "is", "be"], answer: "were" }
+    },
+    {
+      id: "p18", pattern: "He/She ___-s", meaning: "সে ___ করে (third-person singular)",
+      examples: ["He writes code.", "She speaks English.", "He likes coffee."],
+      exercise: { sentence: "He ___ code.", blank: true, options: ["writes", "write", "wrote", "writing"], answer: "writes" }
+    },
+    {
+      id: "p19", pattern: "Let's ___", meaning: "চলো ___ (suggestion)",
+      examples: ["Let's go.", "Let's eat.", "Let's study together."],
+      exercise: { sentence: "Let's ___ together.", blank: true, options: ["study", "studies", "studied", "studying"], answer: "study" }
+    },
+    {
+      id: "p20", pattern: "I used to ___", meaning: "আমি আগে ___ করতাম (past habit)",
+      examples: ["I used to smoke.", "I used to live in Dhaka.", "I used to play cricket."],
+      exercise: { sentence: "I used to ___ in Dhaka.", blank: true, options: ["live", "lived", "living", "lives"], answer: "live" }
     }
   ];
 
