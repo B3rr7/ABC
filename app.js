@@ -1050,7 +1050,25 @@
     if (t) go(t.dataset.mod);
   });
 
+  function applyTheme(t) {
+    if (t === "light") document.documentElement.setAttribute("data-theme", "light");
+    else document.documentElement.removeAttribute("data-theme");
+    const b = document.getElementById("theme-btn");
+    if (b) b.textContent = (t === "light") ? "☀️" : "🌙";
+  }
+  function initTheme() {
+    applyTheme(store.get("theme", "dark"));
+    const b = document.getElementById("theme-btn");
+    if (b) b.addEventListener("click", () => {
+      const cur = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+      const next = cur === "light" ? "dark" : "light";
+      applyTheme(next);
+      store.set("theme", next);
+    });
+  }
+
   // init
+  initTheme();
   checkStorage();
   bootLog();
   if (!synth) toast("শব্দের জন্য speechSynthesis পাওয়া যায়নি");

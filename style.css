@@ -13,6 +13,20 @@
   --sans:'Inter', 'Noto Sans Bengali', sans-serif;
   --bn:'Noto Sans Bengali','Inter',sans-serif;
 }
+[data-theme="light"]{
+  --bg:#F4F6FA;
+  --surface:#FFFFFF;
+  --surface-2:#E9EEF5;
+  --line:#D6DDE8;
+  --text:#0B0E14;
+  --muted:#5A6573;
+  --amber:#B8860B;
+  --cyan:#0E7C72;
+  --red:#C0392B;
+}
+body, .card, .flashcard, .progresswrap, .tabbar, .terminal, .note-box, .tile, .popover, .btn, .opt, .speak, .passage{
+  transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+}
 * { box-sizing:border-box; margin:0; padding:0; }
 html { scroll-behavior:smooth; }
 body{
@@ -70,7 +84,7 @@ h1.title .paren { color:var(--muted); }
 
 /* ===== PROGRESS BAR (sticky) ===== */
 .progresswrap{
-  position:sticky; top:0; z-index:40; background:rgba(11,14,20,.9);
+  position:sticky; top:0; z-index:40; background:var(--bg);
   backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
   padding:10px 6vw; display:flex; align-items:center; gap:14px; max-width:1000px; margin:0 auto;
 }
@@ -78,6 +92,12 @@ h1.title .paren { color:var(--muted); }
 .progressbar{ flex:1; height:6px; background:var(--surface-2); border-radius:4px; overflow:hidden; }
 .progressbar-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--amber)); transition:width .4s; }
 .progresswrap .pct{ font-family:var(--mono); font-size:12px; color:var(--amber); min-width:38px; text-align:right; }
+.theme-btn{
+  flex:0 0 auto; width:30px; height:30px; border-radius:50%; cursor:pointer;
+  background:var(--surface-2); border:1px solid var(--line); color:var(--text);
+  font-size:15px; display:inline-flex; align-items:center; justify-content:center; line-height:0;
+}
+.theme-btn:active{ transform:scale(.9); }
 
 /* ===== TAB NAV ===== */
 .tabbar{
